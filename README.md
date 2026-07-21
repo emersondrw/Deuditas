@@ -1,32 +1,24 @@
-# React + TypeScript + Vite
+# Deuditas
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Controla quién te debe y a quién le debes. App web progresiva, sin servidores ni cuentas — todo se guarda en tu navegador.
 
-Currently, two official plugins are available:
+## Funcionalidades
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Registrar deudas** — Añade personas con el tipo "Me deben" o "Debo". Si la persona ya existe, se suma automáticamente.
+- **Pagar / Reabrir** — Marca deudas como pagadas desde la tarjeta. Puedes reabrirlas si fue error.
+- **Detalle e historial** — Cada deuda tiene un historial completo con pagos parciales, incrementos y notas.
+- **Autocompletado** — Mientras escribes un nombre, sugiere personas ya registradas.
+- **Resumen** — Vista rápida de cuánto te deben, cuánto debes y el balance neto.
+- **Exportar / Importar** — Respaldos en JSON para llevar tus datos a otro dispositivo.
+- **Privacidad total** — Sin cuentas, sin servidores. Todo queda en localStorage de tu navegador.
 
-## React Compiler
+## Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+React 19, TypeScript, Tailwind CSS, Vite.
 
-## Expanding the Oxlint configuration
+## Desarrollo
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm dev       # servidor de desarrollo
+npm run build # compilar para producción
 ```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
