@@ -51,27 +51,27 @@ export function DebtDetail({ entry, onClose, onAddPago, onAddIncremento }: Props
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
       onClick={onClose}
     >
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/70" />
 
       <div
         onClick={e => e.stopPropagation()}
-        className="relative w-full sm:max-w-md max-h-[85vh] overflow-y-auto glass rounded-t-3xl sm:rounded-3xl p-6 border border-white/10 animate-slide-up"
+        className="relative w-full sm:max-w-md max-h-[85vh] overflow-y-auto bg-[#0b0b0b] border-t border-border-custom sm:border rounded-t-xl sm:rounded-xl p-6 animate-slide-up shadow-2xl"
       >
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className={`text-xl font-bold ${isOwed ? "text-green-400" : "text-red-400"}`}>
+            <h2 className={`font-display text-xl ${isOwed ? "text-accent-owed" : "text-accent-owe"}`}>
               {entry.name}
             </h2>
-            <p className="text-sm text-neutral-400 mt-0.5">
-              {isOwed ? "Te debe" : "Le debes"} —{" "}
-              <span className={isOwed ? "text-green-400" : "text-red-400"}>
-                {formatCurrency(entry.amount)}
-              </span>
+            <p className="text-sm text-text-secondary mt-0.5 font-body">
+              {isOwed ? "Te debe" : "Le debes"}
+            </p>
+            <p className={`font-mono text-lg font-semibold tabular-nums mt-1 ${isOwed ? "text-accent-owed" : "text-accent-owe"}`}>
+              {formatCurrency(entry.amount)}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-white/20 transition-colors"
+            className="w-8 h-8 rounded-md bg-[#222] flex items-center justify-center text-text-secondary hover:text-white hover:bg-[#2a2a2a] transition-colors"
           >
             ✕
           </button>
@@ -80,20 +80,20 @@ export function DebtDetail({ entry, onClose, onAddPago, onAddIncremento }: Props
         <div className="flex gap-2 mb-6">
           <button
             onClick={() => { setAction("pago"); setAmount("") }}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+            className={`flex-1 py-2.5 rounded-md text-sm font-medium transition-colors font-body ${
               action === "pago"
-                ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                : "bg-white/10 text-neutral-300 border border-transparent hover:bg-white/20"
+                ? "bg-accent-owed/10 text-accent-owed border border-accent-owed/25"
+                : "bg-[#222] text-text-secondary border border-border-custom hover:bg-surface-hover"
             }`}
           >
             Pago parcial
           </button>
           <button
             onClick={() => { setAction("incremento"); setAmount("") }}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+            className={`flex-1 py-2.5 rounded-md text-sm font-medium transition-colors font-body ${
               action === "incremento"
-                ? "bg-red-500/20 text-red-400 border border-red-500/30"
-                : "bg-white/10 text-neutral-300 border border-transparent hover:bg-white/20"
+                ? "bg-accent-owe/10 text-accent-owe border border-accent-owe/25"
+                : "bg-[#222] text-text-secondary border border-border-custom hover:bg-surface-hover"
             }`}
           >
             Incrementar
@@ -101,8 +101,8 @@ export function DebtDetail({ entry, onClose, onAddPago, onAddIncremento }: Props
         </div>
 
         {action && (
-          <div className="mb-6 p-4 rounded-xl bg-white/5 border border-white/10">
-            <p className="text-xs uppercase tracking-widest text-neutral-500 mb-3">
+          <div className="mb-6 p-4 rounded-md ledger-card">
+            <p className="text-[11px] uppercase tracking-[0.15em] text-text-secondary mb-3 font-body">
               {action === "pago" ? "Registrar pago parcial" : "Incrementar deuda"}
             </p>
             <input
@@ -113,7 +113,7 @@ export function DebtDetail({ entry, onClose, onAddPago, onAddIncremento }: Props
               value={amount}
               onChange={e => setAmount(e.target.value)}
               onKeyDown={e => { if (e.key === "Enter") handleSubmit() }}
-              className="w-full bg-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-500 border border-white/10 focus:outline-none focus:border-white/30 transition-colors mb-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="w-full ledger-input rounded-md px-4 py-3 text-sm text-white placeholder-text-secondary/50 font-mono tabular-nums mb-2"
               autoFocus
             />
             <input
@@ -122,11 +122,11 @@ export function DebtDetail({ entry, onClose, onAddPago, onAddIncremento }: Props
               value={note}
               onChange={e => setNote(e.target.value)}
               onKeyDown={e => { if (e.key === "Enter") handleSubmit() }}
-              className="w-full bg-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-500 border border-white/10 focus:outline-none focus:border-white/30 transition-colors mb-3"
+              className="w-full ledger-input rounded-md px-4 py-3 text-sm text-white placeholder-text-secondary/50 font-body mb-3"
             />
             <button
               onClick={handleSubmit}
-              className="w-full py-3 rounded-xl text-sm font-semibold bg-white text-black hover:bg-white/90 transition-colors"
+              className="w-full py-3 rounded-md text-sm font-semibold bg-white text-[#0b0b0b] hover:bg-white/90 transition-colors font-body ledger-btn"
             >
               {action === "pago" ? "Registrar pago" : "Incrementar"}
             </button>
@@ -134,24 +134,27 @@ export function DebtDetail({ entry, onClose, onAddPago, onAddIncremento }: Props
         )}
 
         <div>
-          <p className="text-xs uppercase tracking-widest text-neutral-500 mb-3">
-            Historial ({history.length})
-          </p>
+          <div className="flex items-center gap-2 mb-3">
+            <p className="text-[11px] uppercase tracking-[0.15em] text-text-secondary font-body font-medium">
+              Historial
+            </p>
+            <span className="font-mono text-[10px] text-border-custom">{history.length}</span>
+          </div>
           {history.map(h => (
             <div
               key={h.id}
-              className="flex items-center justify-between py-2.5 border-b border-white/5 last:border-0"
+              className="flex items-center justify-between py-2.5 border-b border-border-custom/50 last:border-0"
             >
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-neutral-300">
+                <p className="text-sm text-white/80 font-body">
                   {h.type === "creacion" && "Creación"}
                   {h.type === "pago-parcial" && "Pago parcial"}
                   {h.type === "incremento" && "Incremento"}
                   {h.note && (
-                    <span className="text-neutral-500 ml-1">— {h.note}</span>
+                    <span className="text-text-secondary ml-1.5">— {h.note}</span>
                   )}
                 </p>
-                <p className="text-xs text-neutral-500 mt-0.5">
+                <p className="text-[11px] text-text-secondary mt-0.5 font-mono">
                   {new Date(h.date).toLocaleDateString("es-MX", {
                     day: "numeric",
                     month: "short",
@@ -162,8 +165,8 @@ export function DebtDetail({ entry, onClose, onAddPago, onAddIncremento }: Props
                 </p>
               </div>
               <span
-                className={`text-sm font-medium shrink-0 ml-3 ${
-                  h.type === "pago-parcial" ? "text-green-400" : "text-red-400"
+                className={`font-mono text-sm font-semibold tabular-nums shrink-0 ml-3 ${
+                  h.type === "pago-parcial" ? "text-accent-owed" : "text-accent-owe"
                 }`}
               >
                 {h.type === "pago-parcial" ? "-" : "+"}{formatCurrency(Math.abs(h.amount))}

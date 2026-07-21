@@ -59,27 +59,27 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white pb-24">
-      <div className="max-w-lg mx-auto px-4 pt-6">
-        <header className="mb-6">
-          <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-[#0b0b0b] text-white pb-24">
+      <div className="max-w-md mx-auto px-4 pt-8">
+        <header className="mb-8">
+          <div className="flex items-start justify-between">
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold tracking-tight">Deuditas</h1>
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-display leading-none">Deuditas</h1>
                 <button
                   onClick={() => setInfoOpen(true)}
-                  className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-neutral-500 hover:text-white hover:bg-white/20 transition-all duration-200 text-xs"
+                  className="w-6 h-6 rounded-full bg-[#2a2a2a] flex items-center justify-center text-text-secondary hover:text-white hover:bg-[#333] transition-colors text-xs"
                   title="Cómo funciona"
                 >
                   ?
                 </button>
               </div>
-              <p className="text-sm text-neutral-500 mt-0.5">Controla quién te debe y a quién le debes</p>
+              <p className="text-sm text-text-secondary mt-2 font-body">Controla quién te debe y a quién le debes</p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-1.5">
               <button
                 onClick={handleExport}
-                className="glass rounded-xl px-3 py-2 text-xs text-neutral-400 hover:text-white hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-1.5"
+                className="px-2.5 py-1.5 rounded-lg text-xs text-text-secondary hover:text-white hover:bg-surface transition-colors font-body flex items-center gap-1"
                 title="Exportar respaldo"
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -89,7 +89,7 @@ export default function App() {
               </button>
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="glass rounded-xl px-3 py-2 text-xs text-neutral-400 hover:text-white hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-1.5"
+                className="px-2.5 py-1.5 rounded-lg text-xs text-text-secondary hover:text-white hover:bg-surface transition-colors font-body flex items-center gap-1"
                 title="Importar respaldo"
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -105,6 +105,11 @@ export default function App() {
                 className="hidden"
               />
             </div>
+          </div>
+          <div className="mt-5 flex items-center gap-2 text-border-custom select-none">
+            <span className="flex-1 h-px bg-border-custom" />
+            <span className="font-mono text-[10px] text-border-custom tracking-[0.2em]">DEUDITAS</span>
+            <span className="flex-1 h-px bg-border-custom" />
           </div>
         </header>
 
@@ -124,7 +129,7 @@ export default function App() {
       </div>
 
       {toast && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 glass rounded-xl px-5 py-3 text-sm text-white z-50 animate-slide-up">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 ledger-card rounded-xl px-5 py-3 text-sm text-white z-50 animate-slide-up shadow-lg">
           {toast}
         </div>
       )}

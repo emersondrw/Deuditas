@@ -18,9 +18,9 @@ export function DebtList({ entries, onTogglePaid, onOpenDetail }: Props) {
 
   if (entries.length === 0) {
     return (
-      <div className="text-center py-12 text-neutral-500">
-        <p className="text-lg">Sin deudas</p>
-        <p className="text-sm mt-1">Agrega tu primera deuda arriba</p>
+      <div className="text-center py-16 text-text-secondary">
+        <p className="font-display text-xl text-white/30">Sin deudas</p>
+        <p className="text-sm mt-2 font-body">Agrega tu primera deuda arriba</p>
       </div>
     )
   }
@@ -28,10 +28,14 @@ export function DebtList({ entries, onTogglePaid, onOpenDetail }: Props) {
   return (
     <div>
       {activos.length > 0 && (
-        <div className="mb-6">
-          <h2 className="text-xs uppercase tracking-widest text-neutral-500 mb-3 px-1">
-            Activos ({activos.length})
-          </h2>
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-3 px-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-accent-owed" />
+            <h2 className="text-[11px] uppercase tracking-[0.15em] text-text-secondary font-body font-medium">
+              Activos
+            </h2>
+            <span className="font-mono text-[10px] text-border-custom ml-auto">{activos.length}</span>
+          </div>
           {activos.map(e => (
             <DebtCard
               key={e.id}
@@ -45,9 +49,13 @@ export function DebtList({ entries, onTogglePaid, onOpenDetail }: Props) {
 
       {pagados.length > 0 && (
         <div>
-          <h2 className="text-xs uppercase tracking-widest text-neutral-500 mb-3 px-1">
-            Pagados ({pagados.length})
-          </h2>
+          <div className="flex items-center gap-2 mb-3 px-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-border-custom" />
+            <h2 className="text-[11px] uppercase tracking-[0.15em] text-text-secondary font-body font-medium">
+              Pagados
+            </h2>
+            <span className="font-mono text-[10px] text-border-custom ml-auto">{pagados.length}</span>
+          </div>
           {pagados.map(e => (
             <DebtCard
               key={e.id}

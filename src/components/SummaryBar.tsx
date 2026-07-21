@@ -19,20 +19,27 @@ export function SummaryBar({ entries }: Props) {
   const diff = totalMeDeben - totalDebo
 
   return (
-    <div className="grid grid-cols-2 gap-3 mb-6">
-      <div className="glass rounded-2xl p-4 border border-red-500/20">
-        <p className="text-xs uppercase tracking-widest text-red-400/70 mb-1">Debo</p>
-        <p className="text-2xl font-bold text-red-400">{formatCurrency(totalDebo)}</p>
+    <div className="mb-8">
+      <div className="grid grid-cols-2 gap-3">
+        <div className="ledger-card rounded-lg p-4 border-l-2 border-l-accent-owe">
+          <p className="text-[11px] uppercase tracking-[0.15em] text-accent-owe/70 mb-1.5 font-body">Debo</p>
+          <p className="text-2xl font-mono font-semibold text-accent-owe tabular-nums leading-none">{formatCurrency(totalDebo)}</p>
+        </div>
+        <div className="ledger-card rounded-lg p-4 border-l-2 border-l-accent-owed">
+          <p className="text-[11px] uppercase tracking-[0.15em] text-accent-owed/70 mb-1.5 font-body">Me deben</p>
+          <p className="text-2xl font-mono font-semibold text-accent-owed tabular-nums leading-none">{formatCurrency(totalMeDeben)}</p>
+        </div>
       </div>
-      <div className="glass rounded-2xl p-4 border border-green-500/20">
-        <p className="text-xs uppercase tracking-widest text-green-400/70 mb-1">Me deben</p>
-        <p className="text-2xl font-bold text-green-400">{formatCurrency(totalMeDeben)}</p>
-      </div>
-      <div className="col-span-2 glass rounded-2xl p-3 border border-neutral-500/20 text-center">
-        <p className="text-xs uppercase tracking-widest text-neutral-500 mb-0.5">Balance neto</p>
-        <p className={`text-lg font-semibold ${diff >= 0 ? "text-green-400" : "text-red-400"}`}>
-          {diff >= 0 ? "+" : ""}{formatCurrency(diff)}
-        </p>
+      <div className="mt-3 ledger-card rounded-lg p-3">
+        <div className="flex items-center justify-between">
+          <p className="text-[11px] uppercase tracking-[0.15em] text-text-secondary font-body">Balance neto</p>
+          <div className="flex items-center gap-2">
+            <span className="h-4 w-px bg-border-custom" />
+            <p className={`font-mono font-semibold text-base tabular-nums ${diff >= 0 ? "text-accent-owed" : "text-accent-owe"}`}>
+              {diff >= 0 ? "+" : ""}{formatCurrency(diff)}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   )

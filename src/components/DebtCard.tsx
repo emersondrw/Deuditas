@@ -13,59 +13,53 @@ export function DebtCard({ entry, onTogglePaid, onOpenDetail }: Props) {
   return (
     <div
       className={`
-        glass rounded-2xl p-4 mb-3 transition-all duration-300
-        ${entry.status === "pagado" ? "opacity-50" : ""}
+        ledger-card rounded-lg p-4 mb-2.5 transition-all duration-300
+        ${entry.status === "pagado" ? "opacity-40" : ""}
       `}
     >
       <div className="flex items-center justify-between gap-3">
-        <div className="flex-1 min-w-0">
-          <button
-            onClick={() => onOpenDetail(entry.id)}
-            className="text-left w-full"
-          >
+        <button
+          onClick={() => onOpenDetail(entry.id)}
+          className="flex-1 min-w-0 text-left"
+        >
+          <div className="flex items-center gap-2.5">
+            <span
+              className={`shrink-0 w-2 h-2 rounded-full ${isOwed ? "bg-accent-owed" : "bg-accent-owe"}`}
+            />
             <h3
               className={`
-                text-lg font-semibold truncate
-                ${entry.status === "pagado" ? "line-through" : ""}
-                ${isOwed ? "text-green-400" : "text-red-400"}
+                font-body font-medium text-sm truncate
+                ${entry.status === "pagado" ? "line-through text-text-secondary" : "text-white"}
               `}
             >
               {entry.name}
             </h3>
-            <p
-              className={`
-                text-sm mt-0.5
-                ${entry.status === "pagado" ? "line-through text-neutral-500" : "text-neutral-300"}
-              `}
-            >
-              {isOwed ? "Te debe" : "Le debes"} —{" "}
-              <span className={isOwed ? "text-green-400" : "text-red-400"}>
-                {formatCurrency(entry.amount)}
-              </span>
+          </div>
+          <div className="flex items-center gap-2 mt-1.5 ml-[18px]">
+            <p className="text-[11px] text-text-secondary font-body">
+              {isOwed ? "Te debe" : "Le debes"}
             </p>
-          </button>
-        </div>
+            <span className="text-border-custom text-[10px]">/</span>
+            <p className={`font-mono text-sm font-semibold tabular-nums ${isOwed ? "text-accent-owed" : "text-accent-owe"}`}>
+              {formatCurrency(entry.amount)}
+            </p>
+          </div>
+        </button>
 
-        <div className="flex items-center gap-2 shrink-0">
-          <span
-            className={`
-              inline-block w-2.5 h-2.5 rounded-full
-              ${isOwed ? "bg-green-400" : "bg-red-400"}
-            `}
-          />
+        <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={() => onOpenDetail(entry.id)}
-            className="text-xs text-neutral-400 hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-white/10"
+            className="text-[11px] text-text-secondary hover:text-white transition-colors px-2 py-1 rounded-md hover:bg-surface-hover font-body"
           >
             Detalle
           </button>
           <button
             onClick={() => onTogglePaid(entry.id)}
             className={`
-              text-xs px-2 py-1 rounded-lg transition-colors
+              text-[11px] px-2 py-1 rounded-md transition-colors font-body
               ${entry.status === "pagado"
-                ? "text-neutral-500 hover:text-neutral-300 hover:bg-white/5"
-                : "text-neutral-400 hover:text-white hover:bg-white/10"
+                ? "text-text-secondary hover:text-white hover:bg-surface-hover"
+                : "text-text-secondary hover:text-white hover:bg-surface-hover"
               }
             `}
           >

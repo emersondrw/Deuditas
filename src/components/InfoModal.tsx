@@ -22,26 +22,26 @@ export function InfoModal({ open, onClose }: Props) {
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
       onClick={onClose}
     >
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/70" />
 
       <div
         onClick={e => e.stopPropagation()}
-        className="relative w-full sm:max-w-md max-h-[85vh] overflow-y-auto glass rounded-t-3xl sm:rounded-3xl p-6 border border-white/10 animate-slide-up"
+        className="relative w-full sm:max-w-md max-h-[85vh] overflow-y-auto bg-[#0b0b0b] border-t border-border-custom sm:border rounded-t-xl sm:rounded-xl p-6 animate-slide-up shadow-2xl"
       >
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-bold text-neutral-100">Cómo funciona</h2>
+          <h2 className="font-display text-xl">Cómo funciona</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-white/20 transition-colors"
+            className="w-8 h-8 rounded-md bg-[#222] flex items-center justify-center text-text-secondary hover:text-white hover:bg-[#2a2a2a] transition-colors"
           >
             ✕
           </button>
         </div>
 
-        <div className="space-y-5 text-sm text-neutral-300">
+        <div className="space-y-5 text-sm text-white/70 font-body">
           <section>
-            <h3 className="font-semibold text-white mb-1 flex items-center gap-2">
-              <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <h3 className="font-medium text-white mb-1 flex items-center gap-2">
+              <svg className="w-4 h-4 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
               </svg>
               Nuevo Dato
@@ -50,8 +50,8 @@ export function InfoModal({ open, onClose }: Props) {
           </section>
 
           <section>
-            <h3 className="font-semibold text-white mb-1 flex items-center gap-2">
-              <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <h3 className="font-medium text-white mb-1 flex items-center gap-2">
+              <svg className="w-4 h-4 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               Pagar / Reabrir
@@ -60,8 +60,8 @@ export function InfoModal({ open, onClose }: Props) {
           </section>
 
           <section>
-            <h3 className="font-semibold text-white mb-1 flex items-center gap-2">
-              <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <h3 className="font-medium text-white mb-1 flex items-center gap-2">
+              <svg className="w-4 h-4 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
               Detalle
@@ -70,8 +70,8 @@ export function InfoModal({ open, onClose }: Props) {
           </section>
 
           <section>
-            <h3 className="font-semibold text-white mb-1 flex items-center gap-2">
-              <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <h3 className="font-medium text-white mb-1 flex items-center gap-2">
+              <svg className="w-4 h-4 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
               </svg>
               Exportar / Importar
@@ -80,8 +80,8 @@ export function InfoModal({ open, onClose }: Props) {
           </section>
 
           <section>
-            <h3 className="font-semibold text-white mb-1 flex items-center gap-2">
-              <span className="text-neutral-400 text-base leading-none">ℹ</span>
+            <h3 className="font-medium text-white mb-1 flex items-center gap-2">
+              <span className="text-text-secondary text-base leading-none">ℹ</span>
               Privacidad
             </h3>
             <p>Todo se guarda en tu navegador. No hay servidores ni cuentas. Tus datos nunca salen de tu dispositivo.</p>
@@ -90,7 +90,7 @@ export function InfoModal({ open, onClose }: Props) {
 
         <button
           onClick={onClose}
-          className="w-full mt-6 py-3 rounded-xl text-sm font-semibold bg-white text-black hover:bg-white/90 transition-colors"
+          className="w-full mt-6 py-3 rounded-md text-sm font-semibold bg-white text-[#0b0b0b] hover:bg-white/90 transition-colors font-body ledger-btn"
         >
           Entendido
         </button>

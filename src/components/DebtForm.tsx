@@ -68,36 +68,36 @@ export function DebtForm({ names, onAdd, onAddToExisting }: Props) {
   }
 
   return (
-    <div className="mb-6">
+    <div className="mb-8">
       {open ? (
-        <div className="glass rounded-2xl p-4 animate-slide-up">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-sm font-medium text-neutral-300">Nueva deuda</p>
+        <div className="ledger-card rounded-lg p-5 animate-slide-up">
+          <div className="flex items-center justify-between mb-5">
+            <p className="font-body text-sm font-medium text-white/80">Nueva deuda</p>
             <button
               onClick={() => setOpen(false)}
-              className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-white/20 transition-colors text-sm"
+              className="w-7 h-7 rounded-md bg-[#222] flex items-center justify-center text-text-secondary hover:text-white hover:bg-[#2a2a2a] transition-colors text-sm"
             >
               ✕
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 mb-3">
+          <div className="grid grid-cols-2 gap-2 mb-4">
             <button
               onClick={() => setType("me-deben")}
-              className={`py-2 px-3 rounded-xl text-sm font-medium transition-colors ${
+              className={`py-2.5 px-3 rounded-md text-sm font-medium transition-colors font-body ${
                 type === "me-deben"
-                  ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                  : "bg-white/5 text-neutral-400 border border-transparent"
+                  ? "bg-accent-owed/10 text-accent-owed border border-accent-owed/25"
+                  : "bg-[#222] text-text-secondary border border-border-custom hover:bg-surface-hover"
               }`}
             >
               Me deben
             </button>
             <button
               onClick={() => setType("debo")}
-              className={`py-2 px-3 rounded-xl text-sm font-medium transition-colors ${
+              className={`py-2.5 px-3 rounded-md text-sm font-medium transition-colors font-body ${
                 type === "debo"
-                  ? "bg-red-500/20 text-red-400 border border-red-500/30"
-                  : "bg-white/5 text-neutral-400 border border-transparent"
+                  ? "bg-accent-owe/10 text-accent-owe border border-accent-owe/25"
+                  : "bg-[#222] text-text-secondary border border-border-custom hover:bg-surface-hover"
               }`}
             >
               Debo
@@ -117,12 +117,12 @@ export function DebtForm({ names, onAdd, onAddToExisting }: Props) {
               onFocus={() => setShowSuggestions(true)}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
               onKeyDown={handleKeyDown}
-              className="w-full bg-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-500 border border-white/10 focus:outline-none focus:border-white/30 transition-colors"
+              className="w-full ledger-input rounded-md px-4 py-3 text-sm text-white placeholder-text-secondary/50 font-body"
             />
             {showSuggestions && suggestions.length > 0 && (
               <ul
                 ref={listRef}
-                className="absolute z-10 left-0 right-0 mt-1 glass rounded-xl overflow-hidden border border-white/10"
+                className="absolute z-10 left-0 right-0 mt-1 ledger-card rounded-md overflow-hidden border border-border-custom"
               >
                 {suggestions.map((s, i) => (
                   <li
@@ -131,8 +131,8 @@ export function DebtForm({ names, onAdd, onAddToExisting }: Props) {
                       setName(s)
                       setShowSuggestions(false)
                     }}
-                    className={`px-4 py-2.5 text-sm cursor-pointer transition-colors ${
-                      i === selectedIndex ? "bg-white/20 text-white" : "text-neutral-300 hover:bg-white/10"
+                    className={`px-4 py-2.5 text-sm cursor-pointer transition-colors font-body ${
+                      i === selectedIndex ? "bg-surface-hover text-white" : "text-text-secondary hover:bg-surface-hover"
                     }`}
                   >
                     {s}
@@ -151,11 +151,11 @@ export function DebtForm({ names, onAdd, onAddToExisting }: Props) {
               value={amount}
               onChange={e => setAmount(e.target.value)}
               onKeyDown={e => { if (e.key === "Enter") submit() }}
-              className="flex-1 bg-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-500 border border-white/10 focus:outline-none focus:border-white/30 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="flex-1 ledger-input rounded-md px-4 py-3 text-sm text-white placeholder-text-secondary/50 font-mono tabular-nums"
             />
             <button
               onClick={() => submit()}
-              className="px-6 py-3 rounded-xl text-sm font-semibold bg-white text-black hover:bg-white/90 transition-colors"
+              className="px-6 py-3 rounded-md text-sm font-semibold bg-white text-[#0b0b0b] hover:bg-white/90 transition-colors font-body ledger-btn"
             >
               Agregar
             </button>
@@ -167,7 +167,7 @@ export function DebtForm({ names, onAdd, onAddToExisting }: Props) {
             setOpen(true)
             setTimeout(() => inputRef.current?.focus(), 100)
           }}
-          className="w-full glass rounded-2xl py-4 text-neutral-400 hover:text-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-center text-sm font-medium flex items-center justify-center gap-2"
+          className="w-full ledger-card rounded-lg py-4 text-text-secondary hover:text-white hover:bg-surface-hover transition-colors text-center text-sm font-medium font-body flex items-center justify-center gap-2 ledger-btn"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
