@@ -5,12 +5,15 @@ import { DebtForm } from "./components/DebtForm"
 import { DebtList } from "./components/DebtList"
 import { DebtDetail } from "./components/DebtDetail"
 import { InfoModal } from "./components/InfoModal"
+import { ExportModal } from "./components/ExportModal"
+import { exportToExcel } from "./utils/exportExcel"
 import type { DebtType } from "./types"
 
 export default function App() {
   const { entries, addEntry, addToExisting, togglePaid, findActiveByNameAndType, names, exportData, importData } = useDebtStore()
   const [detailId, setDetailId] = useState<string | null>(null)
   const [infoOpen, setInfoOpen] = useState(false)
+  const [exportModalOpen, setExportModalOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [toast, setToast] = useState<string | null>(null)
 
@@ -25,7 +28,7 @@ export default function App() {
     return false
   }
 
-  const handleExport = () => {
+  const handleExportJson = () => {
     const json = exportData()
     const blob = new Blob([json], { type: "application/json" })
     const url = URL.createObjectURL(blob)
@@ -34,7 +37,12 @@ export default function App() {
     a.download = `deuditas-${new Date().toISOString().slice(0, 10)}.json`
     a.click()
     URL.revokeObjectURL(url)
-    showToast("Exportado correctamente")
+    showToast("Respaldo JSON exportado")
+  }
+
+  const handleExportExcel = () => {
+    exportToExcel(entries)
+    showToast("Reporte Excel exportado")
   }
 
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,9 +86,9 @@ export default function App() {
             </div>
             <div className="flex gap-1.5">
               <button
-                onClick={handleExport}
+                onClick={() => setExportModalOpen(true)}
                 className="px-2.5 py-1.5 rounded-lg text-xs text-text-secondary hover:text-white hover:bg-surface transition-colors font-body flex items-center gap-1"
-                title="Exportar respaldo"
+                title="Exportar datos"
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
@@ -93,7 +101,7 @@ export default function App() {
                 title="Importar respaldo"
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5 5 5M12 15V3" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
                 </svg>
                 Importar
               </button>
@@ -139,6 +147,13 @@ export default function App() {
         onClose={() => setDetailId(null)}
         onAddPago={(id, amount, note) => addToExisting(id, amount, "pago-parcial", note)}
         onAddIncremento={(id, amount, note) => addToExisting(id, amount, "incremento", note)}
+      />
+
+      <ExportModal
+        open={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        onExportJson={handleExportJson}
+        onExportExcel={handleExportExcel}
       />
 
       <InfoModal open={infoOpen} onClose={() => setInfoOpen(false)} />

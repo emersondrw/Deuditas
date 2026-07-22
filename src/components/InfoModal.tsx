@@ -76,7 +76,7 @@ export function InfoModal({ open, onClose }: Props) {
               </svg>
               Exportar / Importar
             </h3>
-            <p>Respalda tus datos exportando un archivo JSON. Puedes importarlo después para recuperar todo.</p>
+            <p>Exporta tus datos en formato JSON para guardar respaldos o genera un documento Excel (.xlsx) con todos tus registros agrupados y ordenados por nombre.</p>
           </section>
 
           <section>
