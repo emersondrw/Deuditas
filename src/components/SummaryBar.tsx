@@ -1,5 +1,5 @@
 import type { DebtEntry } from "../types"
-import { formatCurrency } from "../utils/format"
+import { formatCurrency, getDebtStatus } from "../utils/format"
 
 interface Props {
   entries: DebtEntry[]
@@ -8,13 +8,17 @@ interface Props {
 export function SummaryBar({ entries }: Props) {
   const activos = entries.filter(e => e.status === "activo")
 
-  const totalDebo = activos
-    .filter(e => e.type === "debo")
-    .reduce((sum, e) => sum + e.amount, 0)
+  let totalDebo = 0
+  let totalMeDeben = 0
 
-  const totalMeDeben = activos
-    .filter(e => e.type === "me-deben")
-    .reduce((sum, e) => sum + e.amount, 0)
+  for (const e of activos) {
+    const { isOwed, displayAmount } = getDebtStatus(e)
+    if (isOwed) {
+      totalMeDeben += displayAmount
+    } else {
+      totalDebo += displayAmount
+    }
+  }
 
   const diff = totalMeDeben - totalDebo
 

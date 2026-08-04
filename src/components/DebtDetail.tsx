@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import type { DebtEntry } from "../types"
-import { formatCurrency } from "../utils/format"
+import { formatCurrency, getDebtStatus } from "../utils/format"
 
 interface Props {
   entry: DebtEntry | null
@@ -25,7 +25,7 @@ export function DebtDetail({ entry, onClose, onAddPago, onAddIncremento }: Props
 
   if (!entry) return null
 
-  const isOwed = entry.type === "me-deben"
+  const { isOwed, displayAmount, label, colorClass } = getDebtStatus(entry)
 
   const handleSubmit = () => {
     const parsed = parseFloat(amount)
@@ -59,14 +59,14 @@ export function DebtDetail({ entry, onClose, onAddPago, onAddIncremento }: Props
       >
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className={`font-display text-xl ${isOwed ? "text-accent-owed" : "text-accent-owe"}`}>
+            <h2 className={`font-display text-xl ${colorClass}`}>
               {entry.name}
             </h2>
             <p className="text-sm text-text-secondary mt-0.5 font-body">
-              {isOwed ? "Te debe" : "Le debes"}
+              {label}
             </p>
-            <p className={`font-mono text-lg font-semibold tabular-nums mt-1 ${isOwed ? "text-accent-owed" : "text-accent-owe"}`}>
-              {formatCurrency(entry.amount)}
+            <p className={`font-mono text-lg font-semibold tabular-nums mt-1 ${colorClass}`}>
+              {formatCurrency(displayAmount)}
             </p>
           </div>
           <button

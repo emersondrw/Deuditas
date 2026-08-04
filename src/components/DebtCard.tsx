@@ -1,5 +1,5 @@
 import type { DebtEntry } from "../types"
-import { formatCurrency } from "../utils/format"
+import { formatCurrency, getDebtStatus } from "../utils/format"
 
 interface Props {
   entry: DebtEntry
@@ -8,7 +8,7 @@ interface Props {
 }
 
 export function DebtCard({ entry, onTogglePaid, onOpenDetail }: Props) {
-  const isOwed = entry.type === "me-deben"
+  const { displayAmount, label, colorClass, bgClass } = getDebtStatus(entry)
 
   return (
     <div
@@ -24,7 +24,7 @@ export function DebtCard({ entry, onTogglePaid, onOpenDetail }: Props) {
         >
           <div className="flex items-center gap-2.5">
             <span
-              className={`shrink-0 w-2 h-2 rounded-full ${isOwed ? "bg-accent-owed" : "bg-accent-owe"}`}
+              className={`shrink-0 w-2 h-2 rounded-full ${bgClass}`}
             />
             <h3
               className={`
@@ -37,11 +37,11 @@ export function DebtCard({ entry, onTogglePaid, onOpenDetail }: Props) {
           </div>
           <div className="flex items-center gap-2 mt-1.5 ml-[18px]">
             <p className="text-[11px] text-text-secondary font-body">
-              {isOwed ? "Te debe" : "Le debes"}
+              {label}
             </p>
             <span className="text-border-custom text-[10px]">/</span>
-            <p className={`font-mono text-sm font-semibold tabular-nums ${isOwed ? "text-accent-owed" : "text-accent-owe"}`}>
-              {formatCurrency(entry.amount)}
+            <p className={`font-mono text-sm font-semibold tabular-nums ${colorClass}`}>
+              {formatCurrency(displayAmount)}
             </p>
           </div>
         </button>
