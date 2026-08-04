@@ -25,7 +25,7 @@ export function DebtDetail({ entry, onClose, onAddPago, onAddIncremento }: Props
 
   if (!entry) return null
 
-  const { isOwed, displayAmount, label, colorClass } = getDebtStatus(entry)
+  const { displayAmount, label, colorClass } = getDebtStatus(entry)
 
   const handleSubmit = () => {
     const parsed = parseFloat(amount)
