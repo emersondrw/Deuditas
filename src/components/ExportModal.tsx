@@ -8,12 +8,13 @@ import { useEffect } from "react"
 
 interface Props {
   open: boolean
+  currency?: string
   onClose: () => void
   onExportJson: () => void
   onExportExcel: () => void
 }
 
-export function ExportModal({ open, onClose, onExportJson, onExportExcel }: Props) {
+export function ExportModal({ open, currency = "PEN", onClose, onExportJson, onExportExcel }: Props) {
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden"
@@ -78,7 +79,7 @@ export function ExportModal({ open, onClose, onExportJson, onExportExcel }: Prop
                   </span>
                 </div>
                 <p className="text-xs text-text-secondary mt-1 font-body leading-relaxed">
-                  Para importar y restaurar tus deudas completas en otra instancia de Deuditas.
+                  Para importar y restaurar tus deudas completas (con configuración de moneda {currency}) en cualquier dispositivo.
                 </p>
               </div>
             </div>
@@ -108,7 +109,7 @@ export function ExportModal({ open, onClose, onExportJson, onExportExcel }: Prop
                   </span>
                 </div>
                 <p className="text-xs text-text-secondary mt-1 font-body leading-relaxed">
-                  Organizado por hojas de resumen y detalle, agrupado y ordenado por nombre.
+                  Organizado por hojas de resumen y detalle en moneda {currency}, agrupado y ordenado por nombre.
                 </p>
               </div>
             </div>

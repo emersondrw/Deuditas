@@ -7,7 +7,7 @@
 import * as XLSX from "xlsx"
 import type { DebtEntry } from "../types"
 
-export function exportToExcel(entries: DebtEntry[]): void {
+export function exportToExcel(entries: DebtEntry[], currency: string = "PEN"): void {
   const wb = XLSX.utils.book_new()
 
   // 1. Group entries by Name
@@ -58,23 +58,23 @@ export function exportToExcel(entries: DebtEntry[]): void {
     .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }))
     .map((g) => ({
       Nombre: g.name,
-      "Me Deben (Activo)": g.activeMeDeben,
-      "Le Debo (Activo)": g.activeDebo,
-      "Saldo Neto Activo": g.activeMeDeben - g.activeDebo,
+      [`Me Deben (Activo) [${currency}]`]: g.activeMeDeben,
+      [`Le Debo (Activo) [${currency}]`]: g.activeDebo,
+      [`Saldo Neto Activo [${currency}]`]: g.activeMeDeben - g.activeDebo,
       "Total Registros": g.totalEntries,
-      "Histórico Pagado (Me deben)": g.pagadosMeDeben,
-      "Histórico Pagado (Le debo)": g.pagadosDebo,
+      [`Histórico Pagado (Me deben) [${currency}]`]: g.pagadosMeDeben,
+      [`Histórico Pagado (Le debo) [${currency}]`]: g.pagadosDebo,
     }))
 
   const summarySheet = XLSX.utils.json_to_sheet(summaryRows)
   summarySheet["!cols"] = [
     { wch: 25 },
-    { wch: 20 },
-    { wch: 20 },
-    { wch: 20 },
+    { wch: 22 },
+    { wch: 22 },
+    { wch: 22 },
     { wch: 15 },
-    { wch: 25 },
-    { wch: 25 },
+    { wch: 28 },
+    { wch: 28 },
   ]
   XLSX.utils.book_append_sheet(wb, summarySheet, "Resumen por Nombre")
 
@@ -82,7 +82,7 @@ export function exportToExcel(entries: DebtEntry[]): void {
   const detailRows = sortedEntries.map((e) => ({
     Nombre: e.name,
     Tipo: e.type === "me-deben" ? "Me deben" : "Le debes",
-    "Monto Actual": e.amount,
+    [`Monto Actual [${currency}]`]: e.amount,
     Estado: e.status === "activo" ? "Activo" : "Pagado",
     "Fecha Creación": e.createdAt,
   }))
@@ -91,21 +91,14 @@ export function exportToExcel(entries: DebtEntry[]): void {
   detailSheet["!cols"] = [
     { wch: 25 },
     { wch: 15 },
-    { wch: 15 },
+    { wch: 18 },
     { wch: 12 },
     { wch: 20 },
   ]
   XLSX.utils.book_append_sheet(wb, detailSheet, "Detalle de Deudas")
 
   // Sheet 3: Historial de Movimientos (Ordenado por Nombre)
-  const historyRows: Array<{
-    Nombre: string
-    "Tipo Deuda": string
-    "Tipo Movimiento": string
-    Monto: number
-    Nota: string
-    Fecha: string
-  }> = []
+  const historyRows: Array<Record<string, string | number>> = []
 
   sortedEntries.forEach((e) => {
     const sortedHistory = [...e.history].sort(
@@ -121,7 +114,7 @@ export function exportToExcel(entries: DebtEntry[]): void {
         Nombre: e.name,
         "Tipo Deuda": e.type === "me-deben" ? "Me deben" : "Le debes",
         "Tipo Movimiento": movType,
-        Monto: h.amount,
+        [`Monto [${currency}]`]: h.amount,
         Nota: h.note || "",
         Fecha: h.date,
       })
@@ -133,7 +126,7 @@ export function exportToExcel(entries: DebtEntry[]): void {
     { wch: 25 },
     { wch: 15 },
     { wch: 18 },
-    { wch: 15 },
+    { wch: 18 },
     { wch: 30 },
     { wch: 20 },
   ]
@@ -141,5 +134,5 @@ export function exportToExcel(entries: DebtEntry[]): void {
 
   // Save workbook
   const dateStr = new Date().toISOString().slice(0, 10)
-  XLSX.writeFile(wb, `deuditas-reporte-${dateStr}.xlsx`)
+  XLSX.writeFile(wb, `deuditas-reporte-${currency.toLowerCase()}-${dateStr}.xlsx`)
 }

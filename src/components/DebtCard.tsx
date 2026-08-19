@@ -3,11 +3,12 @@ import { formatCurrency, getDebtStatus } from "../utils/format"
 
 interface Props {
   entry: DebtEntry
+  currency?: string
   onTogglePaid: (id: string) => void
   onOpenDetail: (id: string) => void
 }
 
-export function DebtCard({ entry, onTogglePaid, onOpenDetail }: Props) {
+export function DebtCard({ entry, currency = "PEN", onTogglePaid, onOpenDetail }: Props) {
   const { displayAmount, label, colorClass, bgClass } = getDebtStatus(entry)
 
   return (
@@ -41,7 +42,7 @@ export function DebtCard({ entry, onTogglePaid, onOpenDetail }: Props) {
             </p>
             <span className="text-border-custom text-[10px]">/</span>
             <p className={`font-mono text-sm font-semibold tabular-nums ${colorClass}`}>
-              {formatCurrency(displayAmount)}
+              {formatCurrency(displayAmount, currency)}
             </p>
           </div>
         </button>

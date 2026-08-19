@@ -1,11 +1,42 @@
-import type { DebtEntry } from "../types"
+import type { DebtEntry, CurrencyInfo } from "../types"
 
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("es-PE", {
-    style: "currency",
-    currency: "PEN",
-    minimumFractionDigits: 2,
-  }).format(amount)
+export const CURRENCIES: CurrencyInfo[] = [
+  { code: "PEN", symbol: "S/", name: "Sol peruano", locale: "es-PE", country: "Perú" },
+  { code: "USD", symbol: "$", name: "Dólar estadounidense", locale: "en-US", country: "Estados Unidos / Internacional" },
+  { code: "EUR", symbol: "€", name: "Euro", locale: "es-ES", country: "Unión Europea" },
+  { code: "MXN", symbol: "$", name: "Peso mexicano", locale: "es-MX", country: "México" },
+  { code: "COP", symbol: "$", name: "Peso colombiano", locale: "es-CO", country: "Colombia" },
+  { code: "ARS", symbol: "$", name: "Peso argentino", locale: "es-AR", country: "Argentina" },
+  { code: "CLP", symbol: "$", name: "Peso chileno", locale: "es-CL", country: "Chile" },
+  { code: "BRL", symbol: "R$", name: "Real brasileño", locale: "pt-BR", country: "Brasil" },
+  { code: "BOB", symbol: "Bs.", name: "Boliviano", locale: "es-BO", country: "Bolivia" },
+  { code: "CRC", symbol: "₡", name: "Colón costarricense", locale: "es-CR", country: "Costa Rica" },
+  { code: "DOP", symbol: "RD$", name: "Peso dominicano", locale: "es-DO", country: "República Dominicana" },
+  { code: "GTQ", symbol: "Q", name: "Quetzal guatemalteco", locale: "es-GT", country: "Guatemala" },
+  { code: "HNL", symbol: "L", name: "Lempira hondureño", locale: "es-HN", country: "Honduras" },
+  { code: "NIO", symbol: "C$", name: "Córdoba nicaragüense", locale: "es-NI", country: "Nicaragua" },
+  { code: "PYG", symbol: "₲", name: "Guaraní paraguayo", locale: "es-PY", country: "Paraguay" },
+  { code: "UYU", symbol: "$U", name: "Peso uruguayo", locale: "es-UY", country: "Uruguay" },
+  { code: "VES", symbol: "Bs.D", name: "Bolívar venezolano", locale: "es-VE", country: "Venezuela" },
+  { code: "GBP", symbol: "£", name: "Libra esterlina", locale: "en-GB", country: "Reino Unido" },
+  { code: "CAD", symbol: "CA$", name: "Dólar canadiense", locale: "en-CA", country: "Canadá" },
+]
+
+export function getCurrencyInfo(code: string = "PEN"): CurrencyInfo {
+  return CURRENCIES.find(c => c.code.toUpperCase() === code.toUpperCase()) || CURRENCIES[0]
+}
+
+export function formatCurrency(amount: number, currencyCode: string = "PEN"): string {
+  const curr = getCurrencyInfo(currencyCode)
+  try {
+    return new Intl.NumberFormat(curr.locale, {
+      style: "currency",
+      currency: curr.code,
+      minimumFractionDigits: 2,
+    }).format(amount)
+  } catch {
+    return `${curr.symbol} ${amount.toFixed(2)}`
+  }
 }
 
 export function generateId(): string {

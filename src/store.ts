@@ -3,6 +3,7 @@ import type { DebtEntry, HistoryEntry, DebtType } from "./types"
 import { generateId, todayISO } from "./utils/format"
 
 const STORAGE_KEY = "deuditas-data"
+const CURRENCY_STORAGE_KEY = "deuditas-currency"
 
 function loadEntries(): DebtEntry[] {
   try {
@@ -12,32 +13,61 @@ function loadEntries(): DebtEntry[] {
   return []
 }
 
+function loadCurrency(): string {
+  try {
+    const raw = localStorage.getItem(CURRENCY_STORAGE_KEY)
+    if (raw && raw.trim()) return raw.trim()
+  } catch { /* ignore */ }
+  return "PEN"
+}
+
 function saveEntries(entries: DebtEntry[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(entries))
 }
 
 export function useDebtStore() {
   const [entries, setEntries] = useState<DebtEntry[]>(loadEntries)
+  const [currency, setCurrencyState] = useState<string>(loadCurrency)
 
   const persist = useCallback((next: DebtEntry[]) => {
     setEntries(next)
     saveEntries(next)
   }, [])
 
+  const setCurrency = useCallback((code: string) => {
+    const clean = code.trim().toUpperCase()
+    setCurrencyState(clean)
+    localStorage.setItem(CURRENCY_STORAGE_KEY, clean)
+  }, [])
+
   const exportData = useCallback(() => {
-    return JSON.stringify(entries, null, 2)
-  }, [entries])
+    return JSON.stringify({
+      version: 1,
+      currency,
+      exportedAt: todayISO(),
+      entries,
+    }, null, 2)
+  }, [entries, currency])
 
   const importData = useCallback((raw: string): boolean => {
     try {
       const parsed = JSON.parse(raw)
-      if (!Array.isArray(parsed)) return false
-      persist(parsed as DebtEntry[])
-      return true
+      if (Array.isArray(parsed)) {
+        persist(parsed as DebtEntry[])
+        return true
+      }
+      if (parsed && Array.isArray(parsed.entries)) {
+        persist(parsed.entries as DebtEntry[])
+        if (typeof parsed.currency === "string" && parsed.currency.trim()) {
+          setCurrency(parsed.currency.trim())
+        }
+        return true
+      }
+      return false
     } catch {
       return false
     }
-  }, [persist])
+  }, [persist, setCurrency])
 
   const addEntry = useCallback((name: string, amount: number, type: DebtType) => {
     const now = todayISO()
@@ -95,5 +125,16 @@ export function useDebtStore() {
 
   const names = Array.from(new Set(entries.map(e => e.name.toLowerCase())))
 
-  return { entries, addEntry, addToExisting, togglePaid, findActiveByNameAndType, names, exportData, importData }
+  return {
+    entries,
+    currency,
+    setCurrency,
+    addEntry,
+    addToExisting,
+    togglePaid,
+    findActiveByNameAndType,
+    names,
+    exportData,
+    importData,
+  }
 }

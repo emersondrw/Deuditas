@@ -1,17 +1,20 @@
 import { useState, useRef, useEffect, useMemo } from "react"
 import type { DebtType } from "../types"
+import { getCurrencyInfo } from "../utils/format"
 
 interface Props {
   names: string[]
+  currency?: string
   onAdd: (name: string, amount: number, type: DebtType) => void
   onAddToExisting: (name: string, amount: number, type: DebtType) => boolean
 }
 
-export function DebtForm({ names, onAdd, onAddToExisting }: Props) {
+export function DebtForm({ names, currency = "PEN", onAdd, onAddToExisting }: Props) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState("")
   const [amount, setAmount] = useState("")
   const [type, setType] = useState<DebtType>("me-deben")
+  const currencyInfo = getCurrencyInfo(currency)
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(-1)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -145,7 +148,7 @@ export function DebtForm({ names, onAdd, onAddToExisting }: Props) {
           <div className="flex gap-2">
             <input
               type="number"
-              placeholder="0.00"
+              placeholder={`0.00 (${currencyInfo.symbol})`}
               min="0"
               step="0.01"
               value={amount}

@@ -18,3 +18,11 @@ export interface DebtEntry {
   createdAt: string
   history: HistoryEntry[]
 }
+
+export interface CurrencyInfo {
+  code: string
+  symbol: string
+  name: string
+  locale: string
+  country?: string
+}

@@ -6,17 +6,21 @@ import { DebtList } from "./components/DebtList"
 import { DebtDetail } from "./components/DebtDetail"
 import { InfoModal } from "./components/InfoModal"
 import { ExportModal } from "./components/ExportModal"
+import { CurrencyModal } from "./components/CurrencyModal"
 import { exportToExcel } from "./utils/exportExcel"
+import { getCurrencyInfo } from "./utils/format"
 import type { DebtType } from "./types"
 
 export default function App() {
-  const { entries, addEntry, addToExisting, togglePaid, findActiveByNameAndType, names, exportData, importData } = useDebtStore()
+  const { entries, currency, setCurrency, addEntry, addToExisting, togglePaid, findActiveByNameAndType, names, exportData, importData } = useDebtStore()
   const [detailId, setDetailId] = useState<string | null>(null)
   const [infoOpen, setInfoOpen] = useState(false)
   const [exportModalOpen, setExportModalOpen] = useState(false)
+  const [currencyModalOpen, setCurrencyModalOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [toast, setToast] = useState<string | null>(null)
 
+  const currencyInfo = getCurrencyInfo(currency)
   const detailEntry = detailId ? entries.find(e => e.id === detailId) ?? null : null
 
   const handleAddToExisting = (name: string, amount: number, type: DebtType): boolean => {
@@ -41,7 +45,7 @@ export default function App() {
   }
 
   const handleExportExcel = () => {
-    exportToExcel(entries)
+    exportToExcel(entries, currency)
     showToast("Reporte Excel exportado")
   }
 
@@ -70,40 +74,54 @@ export default function App() {
     <div className="min-h-screen bg-[#0b0b0b] text-white pb-24">
       <div className="max-w-md mx-auto px-4 pt-8">
         <header className="mb-8">
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between gap-3">
             <div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                 <h1 className="text-3xl font-display leading-none">Deuditas</h1>
                 <button
                   onClick={() => setInfoOpen(true)}
-                  className="w-6 h-6 rounded-full bg-[#2a2a2a] flex items-center justify-center text-text-secondary hover:text-white hover:bg-[#333] transition-colors text-xs"
+                  className="w-6 h-6 rounded-full bg-[#2a2a2a] flex items-center justify-center text-text-secondary hover:text-white hover:bg-[#333] transition-colors text-xs cursor-pointer"
                   title="Cómo funciona"
                 >
                   ?
                 </button>
+                <button
+                  onClick={() => setCurrencyModalOpen(true)}
+                  className="px-2.5 py-1 rounded-full bg-[#181818] border border-border-custom hover:border-text-secondary/50 hover:bg-[#222] text-xs font-mono text-white/90 hover:text-white transition-all flex items-center gap-1.5 group cursor-pointer shadow-xs"
+                  title="Cambiar moneda"
+                >
+                  <span className="text-accent-owed font-semibold">{currencyInfo.symbol}</span>
+                  <span className="text-text-secondary group-hover:text-white text-[11px] transition-colors">{currencyInfo.code}</span>
+                  <svg className="w-3 h-3 text-text-secondary/60 group-hover:text-text-secondary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
               </div>
               <p className="text-sm text-text-secondary mt-2 font-body">Controla quién te debe y a quién le debes</p>
             </div>
-            <div className="flex gap-1.5">
+            <div className="flex gap-1.5 shrink-0">
+              {/* Botón Exportar (Hacia afuera / Subida / Exportación) */}
               <button
                 onClick={() => setExportModalOpen(true)}
-                className="px-2.5 py-1.5 rounded-lg text-xs text-text-secondary hover:text-white hover:bg-surface transition-colors font-body flex items-center gap-1"
-                title="Exportar datos"
+                className="px-2.5 py-1.5 rounded-lg text-xs text-text-secondary hover:text-white bg-[#141414] hover:bg-[#1c1c1c] border border-border-custom/80 hover:border-emerald-500/40 transition-all font-body flex items-center gap-1.5 cursor-pointer group"
+                title="Exportar registros (JSON o Excel)"
               >
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+                <svg className="w-3.5 h-3.5 text-text-secondary group-hover:text-emerald-400 group-hover:-translate-y-0.5 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                 </svg>
-                Exportar
+                <span>Exportar</span>
               </button>
+
+              {/* Botón Importar (Hacia adentro / Bajada / Carga) */}
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="px-2.5 py-1.5 rounded-lg text-xs text-text-secondary hover:text-white hover:bg-surface transition-colors font-body flex items-center gap-1"
-                title="Importar respaldo"
+                className="px-2.5 py-1.5 rounded-lg text-xs text-text-secondary hover:text-white bg-[#141414] hover:bg-[#1c1c1c] border border-border-custom/80 hover:border-blue-500/40 transition-all font-body flex items-center gap-1.5 cursor-pointer group"
+                title="Importar respaldo (.json)"
               >
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+                <svg className="w-3.5 h-3.5 text-text-secondary group-hover:text-blue-400 group-hover:translate-y-0.5 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                Importar
+                <span>Importar</span>
               </button>
               <input
                 ref={fileInputRef}
@@ -121,16 +139,18 @@ export default function App() {
           </div>
         </header>
 
-        <SummaryBar entries={entries} />
+        <SummaryBar entries={entries} currency={currency} />
 
         <DebtForm
           names={names}
+          currency={currency}
           onAdd={addEntry}
           onAddToExisting={handleAddToExisting}
         />
 
         <DebtList
           entries={entries}
+          currency={currency}
           onTogglePaid={togglePaid}
           onOpenDetail={setDetailId}
         />
@@ -144,6 +164,7 @@ export default function App() {
 
       <DebtDetail
         entry={detailEntry}
+        currency={currency}
         onClose={() => setDetailId(null)}
         onAddPago={(id, amount, note) => addToExisting(id, amount, "pago-parcial", note)}
         onAddIncremento={(id, amount, note) => addToExisting(id, amount, "incremento", note)}
@@ -151,9 +172,20 @@ export default function App() {
 
       <ExportModal
         open={exportModalOpen}
+        currency={currency}
         onClose={() => setExportModalOpen(false)}
         onExportJson={handleExportJson}
         onExportExcel={handleExportExcel}
+      />
+
+      <CurrencyModal
+        open={currencyModalOpen}
+        currentCurrency={currency}
+        onSelectCurrency={(code) => {
+          setCurrency(code)
+          showToast(`Moneda cambiada a ${code}`)
+        }}
+        onClose={() => setCurrencyModalOpen(false)}
       />
 
       <InfoModal open={infoOpen} onClose={() => setInfoOpen(false)} />

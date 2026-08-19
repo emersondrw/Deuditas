@@ -1,18 +1,20 @@
 import { useState, useEffect } from "react"
 import type { DebtEntry } from "../types"
-import { formatCurrency, getDebtStatus } from "../utils/format"
+import { formatCurrency, getDebtStatus, getCurrencyInfo } from "../utils/format"
 
 interface Props {
   entry: DebtEntry | null
+  currency?: string
   onClose: () => void
   onAddPago: (id: string, amount: number, note?: string) => void
   onAddIncremento: (id: string, amount: number, note?: string) => void
 }
 
-export function DebtDetail({ entry, onClose, onAddPago, onAddIncremento }: Props) {
+export function DebtDetail({ entry, currency = "PEN", onClose, onAddPago, onAddIncremento }: Props) {
   const [amount, setAmount] = useState("")
   const [note, setNote] = useState("")
   const [action, setAction] = useState<"pago" | "incremento" | null>(null)
+  const currencyInfo = getCurrencyInfo(currency)
 
   useEffect(() => {
     if (entry) {
@@ -66,7 +68,7 @@ export function DebtDetail({ entry, onClose, onAddPago, onAddIncremento }: Props
               {label}
             </p>
             <p className={`font-mono text-lg font-semibold tabular-nums mt-1 ${colorClass}`}>
-              {formatCurrency(displayAmount)}
+              {formatCurrency(displayAmount, currency)}
             </p>
           </div>
           <button
@@ -107,7 +109,7 @@ export function DebtDetail({ entry, onClose, onAddPago, onAddIncremento }: Props
             </p>
             <input
               type="number"
-              placeholder="Monto"
+              placeholder={`Monto (${currencyInfo.symbol})`}
               min="0"
               step="0.01"
               value={amount}
@@ -155,7 +157,7 @@ export function DebtDetail({ entry, onClose, onAddPago, onAddIncremento }: Props
                   )}
                 </p>
                 <p className="text-[11px] text-text-secondary mt-0.5 font-mono">
-                  {new Date(h.date).toLocaleDateString("es-PE", {
+                  {new Date(h.date).toLocaleDateString(currencyInfo.locale || "es-PE", {
                     day: "numeric",
                     month: "short",
                     year: "numeric",
@@ -169,7 +171,7 @@ export function DebtDetail({ entry, onClose, onAddPago, onAddIncremento }: Props
                   h.type === "pago-parcial" ? "text-accent-owed" : "text-accent-owe"
                 }`}
               >
-                {h.type === "pago-parcial" ? "-" : "+"}{formatCurrency(Math.abs(h.amount))}
+                {h.type === "pago-parcial" ? "-" : "+"}{formatCurrency(Math.abs(h.amount), currency)}
               </span>
             </div>
           ))}

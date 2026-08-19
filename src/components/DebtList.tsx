@@ -3,11 +3,12 @@ import { DebtCard } from "./DebtCard"
 
 interface Props {
   entries: DebtEntry[]
+  currency?: string
   onTogglePaid: (id: string) => void
   onOpenDetail: (id: string) => void
 }
 
-export function DebtList({ entries, onTogglePaid, onOpenDetail }: Props) {
+export function DebtList({ entries, currency = "PEN", onTogglePaid, onOpenDetail }: Props) {
   const activos = entries
     .filter(e => e.status === "activo")
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -40,6 +41,7 @@ export function DebtList({ entries, onTogglePaid, onOpenDetail }: Props) {
             <DebtCard
               key={e.id}
               entry={e}
+              currency={currency}
               onTogglePaid={onTogglePaid}
               onOpenDetail={onOpenDetail}
             />
@@ -60,6 +62,7 @@ export function DebtList({ entries, onTogglePaid, onOpenDetail }: Props) {
             <DebtCard
               key={e.id}
               entry={e}
+              currency={currency}
               onTogglePaid={onTogglePaid}
               onOpenDetail={onOpenDetail}
             />
