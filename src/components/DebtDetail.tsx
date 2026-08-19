@@ -155,7 +155,7 @@ export function DebtDetail({ entry, onClose, onAddPago, onAddIncremento }: Props
                   )}
                 </p>
                 <p className="text-[11px] text-text-secondary mt-0.5 font-mono">
-                  {new Date(h.date).toLocaleDateString("es-MX", {
+                  {new Date(h.date).toLocaleDateString("es-PE", {
                     day: "numeric",
                     month: "short",
                     year: "numeric",

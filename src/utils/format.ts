@@ -1,9 +1,9 @@
 import type { DebtEntry } from "../types"
 
 export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("es-MX", {
+  return new Intl.NumberFormat("es-PE", {
     style: "currency",
-    currency: "MXN",
+    currency: "PEN",
     minimumFractionDigits: 2,
   }).format(amount)
 }
