@@ -84,9 +84,9 @@ export function InfoModal({ open, onClose }: Props) {
               <svg className="w-4 h-4 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              Moneda personalizada
+              Multi-moneda y Moneda por Deuda
             </h3>
-            <p>Puedes cambiar la moneda de la aplicación en cualquier momento desde el botón de moneda en el encabezado. Todos los montos y reportes se adaptarán automáticamente a la moneda elegida.</p>
+            <p>Puedes definir la moneda global desde el botón en el encabezado y también elegir una moneda específica para cada deuda al registrarla. Si tienes deudas en varias monedas, la barra de resumen te permitirá alternar y consultar los balances separados por moneda sin mezclarlos.</p>
           </section>
 
           <section>

@@ -7,14 +7,15 @@
 import * as XLSX from "xlsx"
 import type { DebtEntry } from "../types"
 
-export function exportToExcel(entries: DebtEntry[], currency: string = "PEN"): void {
+export function exportToExcel(entries: DebtEntry[], defaultCurrency: string = "PEN"): void {
   const wb = XLSX.utils.book_new()
 
-  // 1. Group entries by Name
-  const groupedByName: Record<
+  // 1. Group entries by Name + Currency
+  const groupedByNameAndCurrency: Record<
     string,
     {
       name: string
+      currency: string
       activeMeDeben: number
       activeDebo: number
       pagadosMeDeben: number
@@ -29,10 +30,12 @@ export function exportToExcel(entries: DebtEntry[], currency: string = "PEN"): v
   )
 
   sortedEntries.forEach((entry) => {
-    const key = entry.name.trim().toLowerCase()
-    if (!groupedByName[key]) {
-      groupedByName[key] = {
+    const entryCurrency = (entry.currency || defaultCurrency).trim().toUpperCase()
+    const key = `${entry.name.trim().toLowerCase()}___${entryCurrency}`
+    if (!groupedByNameAndCurrency[key]) {
+      groupedByNameAndCurrency[key] = {
         name: entry.name.trim(),
+        currency: entryCurrency,
         activeMeDeben: 0,
         activeDebo: 0,
         pagadosMeDeben: 0,
@@ -41,7 +44,7 @@ export function exportToExcel(entries: DebtEntry[], currency: string = "PEN"): v
       }
     }
 
-    const group = groupedByName[key]
+    const group = groupedByNameAndCurrency[key]
     group.totalEntries += 1
 
     if (entry.status === "activo") {
@@ -53,45 +56,52 @@ export function exportToExcel(entries: DebtEntry[], currency: string = "PEN"): v
     }
   })
 
-  // Sheet 1: Resumen Agrupado por Nombre
-  const summaryRows = Object.values(groupedByName)
+  // Sheet 1: Resumen Agrupado por Nombre y Moneda
+  const summaryRows = Object.values(groupedByNameAndCurrency)
     .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }))
     .map((g) => ({
       Nombre: g.name,
-      [`Me Deben (Activo) [${currency}]`]: g.activeMeDeben,
-      [`Le Debo (Activo) [${currency}]`]: g.activeDebo,
-      [`Saldo Neto Activo [${currency}]`]: g.activeMeDeben - g.activeDebo,
+      Moneda: g.currency,
+      "Me Deben (Activo)": g.activeMeDeben,
+      "Le Debo (Activo)": g.activeDebo,
+      "Saldo Neto Activo": g.activeMeDeben - g.activeDebo,
       "Total Registros": g.totalEntries,
-      [`Histórico Pagado (Me deben) [${currency}]`]: g.pagadosMeDeben,
-      [`Histórico Pagado (Le debo) [${currency}]`]: g.pagadosDebo,
+      "Histórico Pagado (Me deben)": g.pagadosMeDeben,
+      "Histórico Pagado (Le debo)": g.pagadosDebo,
     }))
 
   const summarySheet = XLSX.utils.json_to_sheet(summaryRows)
   summarySheet["!cols"] = [
     { wch: 25 },
-    { wch: 22 },
-    { wch: 22 },
-    { wch: 22 },
+    { wch: 10 },
+    { wch: 20 },
+    { wch: 20 },
+    { wch: 20 },
     { wch: 15 },
-    { wch: 28 },
-    { wch: 28 },
+    { wch: 25 },
+    { wch: 25 },
   ]
-  XLSX.utils.book_append_sheet(wb, summarySheet, "Resumen por Nombre")
+  XLSX.utils.book_append_sheet(wb, summarySheet, "Resumen por Nombre y Moneda")
 
   // Sheet 2: Detalle de Deudas (Ordenado por Nombre)
-  const detailRows = sortedEntries.map((e) => ({
-    Nombre: e.name,
-    Tipo: e.type === "me-deben" ? "Me deben" : "Le debes",
-    [`Monto Actual [${currency}]`]: e.amount,
-    Estado: e.status === "activo" ? "Activo" : "Pagado",
-    "Fecha Creación": e.createdAt,
-  }))
+  const detailRows = sortedEntries.map((e) => {
+    const entryCurrency = (e.currency || defaultCurrency).trim().toUpperCase()
+    return {
+      Nombre: e.name,
+      Moneda: entryCurrency,
+      Tipo: e.type === "me-deben" ? "Me deben" : "Le debes",
+      "Monto Actual": e.amount,
+      Estado: e.status === "activo" ? "Activo" : "Pagado",
+      "Fecha Creación": e.createdAt,
+    }
+  })
 
   const detailSheet = XLSX.utils.json_to_sheet(detailRows)
   detailSheet["!cols"] = [
     { wch: 25 },
+    { wch: 10 },
     { wch: 15 },
-    { wch: 18 },
+    { wch: 15 },
     { wch: 12 },
     { wch: 20 },
   ]
@@ -101,6 +111,7 @@ export function exportToExcel(entries: DebtEntry[], currency: string = "PEN"): v
   const historyRows: Array<Record<string, string | number>> = []
 
   sortedEntries.forEach((e) => {
+    const entryCurrency = (e.currency || defaultCurrency).trim().toUpperCase()
     const sortedHistory = [...e.history].sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     )
@@ -110,11 +121,14 @@ export function exportToExcel(entries: DebtEntry[], currency: string = "PEN"): v
       if (h.type === "pago-parcial") movType = "Pago parcial"
       if (h.type === "incremento") movType = "Incremento"
 
+      const itemCurrency = (h.currency || entryCurrency).trim().toUpperCase()
+
       historyRows.push({
         Nombre: e.name,
+        Moneda: itemCurrency,
         "Tipo Deuda": e.type === "me-deben" ? "Me deben" : "Le debes",
         "Tipo Movimiento": movType,
-        [`Monto [${currency}]`]: h.amount,
+        Monto: h.amount,
         Nota: h.note || "",
         Fecha: h.date,
       })
@@ -124,9 +138,10 @@ export function exportToExcel(entries: DebtEntry[], currency: string = "PEN"): v
   const historySheet = XLSX.utils.json_to_sheet(historyRows)
   historySheet["!cols"] = [
     { wch: 25 },
+    { wch: 10 },
     { wch: 15 },
     { wch: 18 },
-    { wch: 18 },
+    { wch: 15 },
     { wch: 30 },
     { wch: 20 },
   ]
@@ -134,5 +149,5 @@ export function exportToExcel(entries: DebtEntry[], currency: string = "PEN"): v
 
   // Save workbook
   const dateStr = new Date().toISOString().slice(0, 10)
-  XLSX.writeFile(wb, `deuditas-reporte-${currency.toLowerCase()}-${dateStr}.xlsx`)
+  XLSX.writeFile(wb, `deuditas-reporte-${dateStr}.xlsx`)
 }

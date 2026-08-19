@@ -12,7 +12,7 @@ import { getCurrencyInfo } from "./utils/format"
 import type { DebtType } from "./types"
 
 export default function App() {
-  const { entries, currency, setCurrency, addEntry, addToExisting, togglePaid, findActiveByNameAndType, names, exportData, importData } = useDebtStore()
+  const { entries, currency, setCurrency, addEntry, addToExisting, togglePaid, findActiveByNameTypeAndCurrency, names, exportData, importData } = useDebtStore()
   const [detailId, setDetailId] = useState<string | null>(null)
   const [infoOpen, setInfoOpen] = useState(false)
   const [exportModalOpen, setExportModalOpen] = useState(false)
@@ -23,8 +23,8 @@ export default function App() {
   const currencyInfo = getCurrencyInfo(currency)
   const detailEntry = detailId ? entries.find(e => e.id === detailId) ?? null : null
 
-  const handleAddToExisting = (name: string, amount: number, type: DebtType): boolean => {
-    const existing = findActiveByNameAndType(name, type)
+  const handleAddToExisting = (name: string, amount: number, type: DebtType, itemCurrency: string): boolean => {
+    const existing = findActiveByNameTypeAndCurrency(name, type, itemCurrency)
     if (existing) {
       addToExisting(existing.id, amount, "incremento", `Nuevo registro desde formulario`)
       return true

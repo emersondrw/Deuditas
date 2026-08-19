@@ -10,6 +10,7 @@ interface Props {
 
 export function DebtCard({ entry, currency = "PEN", onTogglePaid, onOpenDetail }: Props) {
   const { displayAmount, label, colorClass, bgClass } = getDebtStatus(entry)
+  const entryCurrency = entry.currency || currency
 
   return (
     <div
@@ -21,7 +22,7 @@ export function DebtCard({ entry, currency = "PEN", onTogglePaid, onOpenDetail }
       <div className="flex items-center justify-between gap-3">
         <button
           onClick={() => onOpenDetail(entry.id)}
-          className="flex-1 min-w-0 text-left"
+          className="flex-1 min-w-0 text-left cursor-pointer"
         >
           <div className="flex items-center gap-2.5">
             <span
@@ -35,6 +36,11 @@ export function DebtCard({ entry, currency = "PEN", onTogglePaid, onOpenDetail }
             >
               {entry.name}
             </h3>
+            {entry.currency && (
+              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-[#202020] text-text-secondary border border-border-custom shrink-0">
+                {entry.currency}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2 mt-1.5 ml-[18px]">
             <p className="text-[11px] text-text-secondary font-body">
@@ -42,7 +48,7 @@ export function DebtCard({ entry, currency = "PEN", onTogglePaid, onOpenDetail }
             </p>
             <span className="text-border-custom text-[10px]">/</span>
             <p className={`font-mono text-sm font-semibold tabular-nums ${colorClass}`}>
-              {formatCurrency(displayAmount, currency)}
+              {formatCurrency(displayAmount, entryCurrency)}
             </p>
           </div>
         </button>

@@ -69,13 +69,15 @@ export function useDebtStore() {
     }
   }, [persist, setCurrency])
 
-  const addEntry = useCallback((name: string, amount: number, type: DebtType) => {
+  const addEntry = useCallback((name: string, amount: number, type: DebtType, entryCurrency?: string) => {
     const now = todayISO()
+    const finalCurrency = (entryCurrency || currency).trim().toUpperCase()
     const historyEntry: HistoryEntry = {
       id: generateId(),
       type: "creacion",
       amount,
       date: now,
+      currency: finalCurrency,
     }
     const entry: DebtEntry = {
       id: generateId(),
@@ -84,18 +86,22 @@ export function useDebtStore() {
       type,
       status: "activo",
       createdAt: now,
+      currency: finalCurrency,
       history: [historyEntry],
     }
     persist([entry, ...entries])
-  }, [entries, persist])
+  }, [entries, currency, persist])
 
   const addToExisting = useCallback((id: string, amount: number, type: HistoryEntry["type"], note?: string) => {
     const now = todayISO()
+    const existing = entries.find(e => e.id === id)
+    const entryCurrency = existing?.currency || currency
     const historyEntry: HistoryEntry = {
       id: generateId(),
       type,
       amount,
       date: now,
+      currency: entryCurrency,
       note,
     }
     const next = entries.map(e => {
@@ -108,7 +114,7 @@ export function useDebtStore() {
       }
     })
     persist(next)
-  }, [entries, persist])
+  }, [entries, currency, persist])
 
   const togglePaid = useCallback((id: string) => {
     const next = entries.map(e =>
@@ -119,9 +125,19 @@ export function useDebtStore() {
     persist(next)
   }, [entries, persist])
 
+  const findActiveByNameTypeAndCurrency = useCallback((name: string, type: DebtType, entryCurrency?: string): DebtEntry | undefined => {
+    const targetCurrency = (entryCurrency || currency).trim().toUpperCase()
+    return entries.find(e =>
+      e.name.toLowerCase() === name.trim().toLowerCase() &&
+      e.type === type &&
+      e.status === "activo" &&
+      ((e.currency || currency).toUpperCase() === targetCurrency)
+    )
+  }, [entries, currency])
+
   const findActiveByNameAndType = useCallback((name: string, type: DebtType): DebtEntry | undefined => {
-    return entries.find(e => e.name.toLowerCase() === name.trim().toLowerCase() && e.type === type && e.status === "activo")
-  }, [entries])
+    return findActiveByNameTypeAndCurrency(name, type, currency)
+  }, [findActiveByNameTypeAndCurrency, currency])
 
   const names = Array.from(new Set(entries.map(e => e.name.toLowerCase())))
 
@@ -132,6 +148,7 @@ export function useDebtStore() {
     addEntry,
     addToExisting,
     togglePaid,
+    findActiveByNameTypeAndCurrency,
     findActiveByNameAndType,
     names,
     exportData,

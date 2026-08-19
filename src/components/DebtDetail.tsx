@@ -14,7 +14,6 @@ export function DebtDetail({ entry, currency = "PEN", onClose, onAddPago, onAddI
   const [amount, setAmount] = useState("")
   const [note, setNote] = useState("")
   const [action, setAction] = useState<"pago" | "incremento" | null>(null)
-  const currencyInfo = getCurrencyInfo(currency)
 
   useEffect(() => {
     if (entry) {
@@ -27,6 +26,8 @@ export function DebtDetail({ entry, currency = "PEN", onClose, onAddPago, onAddI
 
   if (!entry) return null
 
+  const activeCurrency = entry.currency || currency
+  const currencyInfo = getCurrencyInfo(activeCurrency)
   const { displayAmount, label, colorClass } = getDebtStatus(entry)
 
   const handleSubmit = () => {
@@ -61,14 +62,21 @@ export function DebtDetail({ entry, currency = "PEN", onClose, onAddPago, onAddI
       >
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className={`font-display text-xl ${colorClass}`}>
-              {entry.name}
-            </h2>
+            <div className="flex items-center gap-2">
+              <h2 className={`font-display text-xl ${colorClass}`}>
+                {entry.name}
+              </h2>
+              {entry.currency && (
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface text-text-secondary border border-border-custom">
+                  {entry.currency}
+                </span>
+              )}
+            </div>
             <p className="text-sm text-text-secondary mt-0.5 font-body">
               {label}
             </p>
             <p className={`font-mono text-lg font-semibold tabular-nums mt-1 ${colorClass}`}>
-              {formatCurrency(displayAmount, currency)}
+              {formatCurrency(displayAmount, activeCurrency)}
             </p>
           </div>
           <button
@@ -105,7 +113,7 @@ export function DebtDetail({ entry, currency = "PEN", onClose, onAddPago, onAddI
         {action && (
           <div className="mb-6 p-4 rounded-md ledger-card">
             <p className="text-[11px] uppercase tracking-[0.15em] text-text-secondary mb-3 font-body">
-              {action === "pago" ? "Registrar pago parcial" : "Incrementar deuda"}
+              {action === "pago" ? `Registrar pago parcial (${activeCurrency})` : `Incrementar deuda (${activeCurrency})`}
             </p>
             <input
               type="number"
@@ -142,39 +150,42 @@ export function DebtDetail({ entry, currency = "PEN", onClose, onAddPago, onAddI
             </p>
             <span className="font-mono text-[10px] text-border-custom">{history.length}</span>
           </div>
-          {history.map(h => (
-            <div
-              key={h.id}
-              className="flex items-center justify-between py-2.5 border-b border-border-custom/50 last:border-0"
-            >
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-white/80 font-body">
-                  {h.type === "creacion" && "Creación"}
-                  {h.type === "pago-parcial" && "Pago parcial"}
-                  {h.type === "incremento" && "Incremento"}
-                  {h.note && (
-                    <span className="text-text-secondary ml-1.5">— {h.note}</span>
-                  )}
-                </p>
-                <p className="text-[11px] text-text-secondary mt-0.5 font-mono">
-                  {new Date(h.date).toLocaleDateString(currencyInfo.locale || "es-PE", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
-              </div>
-              <span
-                className={`font-mono text-sm font-semibold tabular-nums shrink-0 ml-3 ${
-                  h.type === "pago-parcial" ? "text-accent-owed" : "text-accent-owe"
-                }`}
+          {history.map(h => {
+            const histCurrency = h.currency || activeCurrency
+            return (
+              <div
+                key={h.id}
+                className="flex items-center justify-between py-2.5 border-b border-border-custom/50 last:border-0"
               >
-                {h.type === "pago-parcial" ? "-" : "+"}{formatCurrency(Math.abs(h.amount), currency)}
-              </span>
-            </div>
-          ))}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-white/80 font-body">
+                    {h.type === "creacion" && "Creación"}
+                    {h.type === "pago-parcial" && "Pago parcial"}
+                    {h.type === "incremento" && "Incremento"}
+                    {h.note && (
+                      <span className="text-text-secondary ml-1.5">— {h.note}</span>
+                    )}
+                  </p>
+                  <p className="text-[11px] text-text-secondary mt-0.5 font-mono">
+                    {new Date(h.date).toLocaleDateString(currencyInfo.locale || "es-PE", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </div>
+                <span
+                  className={`font-mono text-sm font-semibold tabular-nums shrink-0 ml-3 ${
+                    h.type === "pago-parcial" ? "text-accent-owed" : "text-accent-owe"
+                  }`}
+                >
+                  {h.type === "pago-parcial" ? "-" : "+"}{formatCurrency(Math.abs(h.amount), histCurrency)}
+                </span>
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>

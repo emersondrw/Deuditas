@@ -6,6 +6,7 @@ export interface HistoryEntry {
   type: "creacion" | "pago-parcial" | "incremento"
   amount: number
   date: string
+  currency?: string
   note?: string
 }
 
@@ -16,6 +17,7 @@ export interface DebtEntry {
   type: DebtType
   status: Status
   createdAt: string
+  currency?: string
   history: HistoryEntry[]
 }
 
