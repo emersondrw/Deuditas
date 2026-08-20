@@ -12,7 +12,7 @@ import { getCurrencyInfo } from "./utils/format"
 import type { DebtType } from "./types"
 
 export default function App() {
-  const { entries, currency, setCurrency, addEntry, addToExisting, togglePaid, findActiveByNameTypeAndCurrency, names, exportData, importData } = useDebtStore()
+  const { entries, currency, setCurrency, addEntry, updateEntry, addToExisting, togglePaid, findActiveByNameTypeAndCurrency, names, exportData, importData } = useDebtStore()
   const [detailId, setDetailId] = useState<string | null>(null)
   const [infoOpen, setInfoOpen] = useState(false)
   const [exportModalOpen, setExportModalOpen] = useState(false)
@@ -168,6 +168,7 @@ export default function App() {
         onClose={() => setDetailId(null)}
         onAddPago={(id, amount, note) => addToExisting(id, amount, "pago-parcial", note)}
         onAddIncremento={(id, amount, note) => addToExisting(id, amount, "incremento", note)}
+        onUpdateEntry={updateEntry}
       />
 
       <ExportModal

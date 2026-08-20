@@ -57,8 +57,8 @@ export function DebtForm({ names, currency = "PEN", onAdd, onAddToExisting }: Pr
 
   const suggestions = useMemo(() => {
     if (name.trim().length < 2) return []
-    const q = name.toLowerCase()
-    return names.filter(n => n.includes(q) && n !== name.toLowerCase()).slice(0, 5)
+    const q = name.trim().toUpperCase()
+    return names.filter(n => n.toUpperCase().includes(q) && n.toUpperCase() !== q).slice(0, 5)
   }, [name, names])
 
   const filteredCurrencies = useMemo(() => {
@@ -78,7 +78,7 @@ export function DebtForm({ names, currency = "PEN", onAdd, onAddToExisting }: Pr
   }, [suggestions.length])
 
   const submit = (selectedName?: string) => {
-    const finalName = (selectedName ?? name).trim()
+    const finalName = (selectedName ?? name).trim().toUpperCase()
     const parsed = parseFloat(amount)
     if (!finalName || isNaN(parsed) || parsed <= 0) return
 
@@ -189,16 +189,16 @@ export function DebtForm({ names, currency = "PEN", onAdd, onAddToExisting }: Pr
             <input
               ref={inputRef}
               type="text"
-              placeholder="Nombre de la persona"
+              placeholder="NOMBRE DE LA PERSONA"
               value={name}
               onChange={e => {
-                setName(e.target.value)
+                setName(e.target.value.toUpperCase())
                 setShowSuggestions(true)
               }}
               onFocus={() => setShowSuggestions(true)}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
               onKeyDown={handleKeyDown}
-              className="w-full ledger-input rounded-md px-4 py-2.5 text-sm text-white placeholder-text-secondary/50 font-body"
+              className="w-full ledger-input rounded-md px-4 py-2.5 text-sm text-white placeholder-text-secondary/50 font-body uppercase"
             />
             {showSuggestions && suggestions.length > 0 && (
               <ul
