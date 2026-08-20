@@ -1,5 +1,6 @@
 import type { DebtEntry } from "../types"
-import { formatCurrency, getDebtStatus } from "../utils/format"
+import { formatCurrency, getDebtStatus, getDueDateStatus } from "../utils/format"
+import { getCategoryInfo } from "../utils/categories"
 
 interface Props {
   entry: DebtEntry
@@ -11,12 +12,15 @@ interface Props {
 export function DebtCard({ entry, currency = "PEN", onTogglePaid, onOpenDetail }: Props) {
   const { displayAmount, label, colorClass, bgClass } = getDebtStatus(entry)
   const entryCurrency = entry.currency || currency
+  const category = getCategoryInfo(entry.category)
+  const dueInfo = getDueDateStatus(entry.dueDate)
+  const isPaid = entry.status === "pagado"
 
   return (
     <div
       className={`
         ledger-card rounded-lg p-4 mb-2.5 transition-all duration-300
-        ${entry.status === "pagado" ? "opacity-40" : ""}
+        ${isPaid ? "opacity-40" : ""}
       `}
     >
       <div className="flex items-center justify-between gap-3">
@@ -24,14 +28,15 @@ export function DebtCard({ entry, currency = "PEN", onTogglePaid, onOpenDetail }
           onClick={() => onOpenDetail(entry.id)}
           className="flex-1 min-w-0 text-left cursor-pointer"
         >
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             <span
               className={`shrink-0 w-2 h-2 rounded-full ${bgClass}`}
             />
+            <span className="text-xs shrink-0" title={category.name}>{category.icon}</span>
             <h3
               className={`
                 font-body font-medium text-sm truncate
-                ${entry.status === "pagado" ? "line-through text-text-secondary" : "text-white"}
+                ${isPaid ? "line-through text-text-secondary" : "text-white"}
               `}
             >
               {entry.name}
@@ -42,7 +47,8 @@ export function DebtCard({ entry, currency = "PEN", onTogglePaid, onOpenDetail }
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2 mt-1.5 ml-[18px]">
+
+          <div className="flex items-center gap-2 mt-1.5 ml-[26px] flex-wrap">
             <p className="text-[11px] text-text-secondary font-body">
               {label}
             </p>
@@ -50,27 +56,29 @@ export function DebtCard({ entry, currency = "PEN", onTogglePaid, onOpenDetail }
             <p className={`font-mono text-sm font-semibold tabular-nums ${colorClass}`}>
               {formatCurrency(displayAmount, entryCurrency)}
             </p>
+            {!isPaid && dueInfo.status !== "none" && (
+              <>
+                <span className="text-border-custom text-[10px]">/</span>
+                <span className={`text-[10px] font-body px-1.5 py-0.5 rounded border ${dueInfo.badgeClass}`}>
+                  {dueInfo.label}
+                </span>
+              </>
+            )}
           </div>
         </button>
 
         <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={() => onOpenDetail(entry.id)}
-            className="text-[11px] text-text-secondary hover:text-white transition-colors px-2 py-1 rounded-md hover:bg-surface-hover font-body"
+            className="text-[11px] text-text-secondary hover:text-white transition-colors px-2 py-1 rounded-md hover:bg-surface-hover font-body cursor-pointer"
           >
             Detalle
           </button>
           <button
             onClick={() => onTogglePaid(entry.id)}
-            className={`
-              text-[11px] px-2 py-1 rounded-md transition-colors font-body
-              ${entry.status === "pagado"
-                ? "text-text-secondary hover:text-white hover:bg-surface-hover"
-                : "text-text-secondary hover:text-white hover:bg-surface-hover"
-              }
-            `}
+            className="text-[11px] px-2 py-1 rounded-md transition-colors font-body text-text-secondary hover:text-white hover:bg-surface-hover cursor-pointer"
           >
-            {entry.status === "pagado" ? "Reabrir" : "Pagado"}
+            {isPaid ? "Reabrir" : "Pagado"}
           </button>
         </div>
       </div>

@@ -6,6 +6,7 @@
  **/
 import * as XLSX from "xlsx"
 import type { DebtEntry } from "../types"
+import { getCategoryInfo } from "./categories"
 
 export function exportToExcel(entries: DebtEntry[], defaultCurrency: string = "PEN"): void {
   const wb = XLSX.utils.book_new()
@@ -86,12 +87,15 @@ export function exportToExcel(entries: DebtEntry[], defaultCurrency: string = "P
   // Sheet 2: Detalle de Deudas (Ordenado por Nombre)
   const detailRows = sortedEntries.map((e) => {
     const entryCurrency = (e.currency || defaultCurrency).trim().toUpperCase()
+    const cat = getCategoryInfo(e.category)
     return {
       Nombre: e.name,
       Moneda: entryCurrency,
+      Categoría: cat.name,
       Tipo: e.type === "me-deben" ? "Me deben" : "Le debes",
       "Monto Actual": e.amount,
       Estado: e.status === "activo" ? "Activo" : "Pagado",
+      "Fecha Límite": e.dueDate || "Sin fecha",
       "Fecha Creación": e.createdAt,
     }
   })
@@ -100,9 +104,11 @@ export function exportToExcel(entries: DebtEntry[], defaultCurrency: string = "P
   detailSheet["!cols"] = [
     { wch: 25 },
     { wch: 10 },
+    { wch: 20 },
     { wch: 15 },
     { wch: 15 },
     { wch: 12 },
+    { wch: 16 },
     { wch: 20 },
   ]
   XLSX.utils.book_append_sheet(wb, detailSheet, "Detalle de Deudas")
@@ -122,10 +128,12 @@ export function exportToExcel(entries: DebtEntry[], defaultCurrency: string = "P
       if (h.type === "incremento") movType = "Incremento"
 
       const itemCurrency = (h.currency || entryCurrency).trim().toUpperCase()
+      const cat = getCategoryInfo(h.category || e.category)
 
       historyRows.push({
         Nombre: e.name,
         Moneda: itemCurrency,
+        Categoría: cat.name,
         "Tipo Deuda": e.type === "me-deben" ? "Me deben" : "Le debes",
         "Tipo Movimiento": movType,
         Monto: h.amount,
@@ -139,6 +147,7 @@ export function exportToExcel(entries: DebtEntry[], defaultCurrency: string = "P
   historySheet["!cols"] = [
     { wch: 25 },
     { wch: 10 },
+    { wch: 20 },
     { wch: 15 },
     { wch: 18 },
     { wch: 15 },

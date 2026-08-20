@@ -69,3 +69,91 @@ export function getDebtStatus(entry: DebtEntry) {
   }
 }
 
+export function formatShortDate(dateStr: string): string {
+  try {
+    const [year, month, day] = dateStr.slice(0, 10).split("-").map(Number)
+    const date = new Date(year, month - 1, day)
+    return date.toLocaleDateString("es-PE", { day: "numeric", month: "short" })
+  } catch {
+    return dateStr
+  }
+}
+
+export function getDueDateStatus(dueDate?: string) {
+  if (!dueDate || !dueDate.trim()) {
+    return {
+      status: "none" as const,
+      label: "",
+      daysDiff: 0,
+      badgeClass: "",
+    }
+  }
+
+  const [year, month, day] = dueDate.slice(0, 10).split("-").map(Number)
+  const due = new Date(year, month - 1, day)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  due.setHours(0, 0, 0, 0)
+
+  const diffTime = due.getTime() - today.getTime()
+  const daysDiff = Math.round(diffTime / (1000 * 60 * 60 * 24))
+
+  if (daysDiff < 0) {
+    const days = Math.abs(daysDiff)
+    return {
+      status: "overdue" as const,
+      label: days === 1 ? "Venció ayer" : `Vencida hace ${days}d`,
+      daysDiff,
+      badgeClass: "text-red-400 bg-red-500/15 border-red-500/40",
+    }
+  }
+
+  if (daysDiff === 0) {
+    return {
+      status: "today" as const,
+      label: "Vence hoy",
+      daysDiff: 0,
+      badgeClass: "text-amber-400 bg-amber-500/20 border-amber-500/40 animate-pulse font-medium",
+    }
+  }
+
+  if (daysDiff <= 3) {
+    return {
+      status: "soon" as const,
+      label: daysDiff === 1 ? "Vence mañana" : `Vence en ${daysDiff}d`,
+      daysDiff,
+      badgeClass: "text-amber-300/90 bg-amber-500/10 border-amber-500/30",
+    }
+  }
+
+  return {
+    status: "future" as const,
+    label: `Vence ${formatShortDate(dueDate)}`,
+    daysDiff,
+    badgeClass: "text-text-secondary bg-[#1a1a1a] border-border-custom",
+  }
+}
+
+export function generateWhatsAppMessage(
+  entry: DebtEntry,
+  categoryName?: string,
+  currencyCode?: string
+): string {
+  const finalCurrency = entry.currency || currencyCode || "PEN"
+  const formattedAmount = formatCurrency(Math.abs(entry.amount), finalCurrency)
+  const isMeDeben = entry.type === "me-deben"
+  const catText = categoryName && categoryName !== "General / Otro" ? ` por concepto de *${categoryName}*` : ""
+  const dueInfo = entry.dueDate ? ` (acordado para el ${formatShortDate(entry.dueDate)})` : ""
+
+  if (isMeDeben) {
+    return encodeURIComponent(
+      `Hola ${entry.name}! 👋 Te escribo para comentarte sobre el saldo pendiente de *${formattedAmount}*${catText}${dueInfo} registrado en Deuditas. Cuando tengas oportunidad me avisas para coordinar. ¡Muchas gracias!`
+    )
+  } else {
+    return encodeURIComponent(
+      `Hola ${entry.name}! 👋 Te escribo para tener presente el saldo pendiente de *${formattedAmount}*${catText}${dueInfo} que te debo. Avísame cómo prefieres que coordinemos el pago. ¡Un abrazo!`
+    )
+  }
+}
+
+

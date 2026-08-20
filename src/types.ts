@@ -7,6 +7,7 @@ export interface HistoryEntry {
   amount: number
   date: string
   currency?: string
+  category?: string
   note?: string
 }
 
@@ -18,6 +19,8 @@ export interface DebtEntry {
   status: Status
   createdAt: string
   currency?: string
+  dueDate?: string
+  category?: string
   history: HistoryEntry[]
 }
 

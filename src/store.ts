@@ -69,15 +69,24 @@ export function useDebtStore() {
     }
   }, [persist, setCurrency])
 
-  const addEntry = useCallback((name: string, amount: number, type: DebtType, entryCurrency?: string) => {
+  const addEntry = useCallback((
+    name: string,
+    amount: number,
+    type: DebtType,
+    entryCurrency?: string,
+    category?: string,
+    dueDate?: string
+  ) => {
     const now = todayISO()
     const finalCurrency = (entryCurrency || currency).trim().toUpperCase()
+    const finalCategory = category?.trim() || "general"
     const historyEntry: HistoryEntry = {
       id: generateId(),
       type: "creacion",
       amount,
       date: now,
       currency: finalCurrency,
+      category: finalCategory,
     }
     const entry: DebtEntry = {
       id: generateId(),
@@ -87,6 +96,8 @@ export function useDebtStore() {
       status: "activo",
       createdAt: now,
       currency: finalCurrency,
+      category: finalCategory,
+      dueDate: dueDate?.trim() || undefined,
       history: [historyEntry],
     }
     persist([entry, ...entries])

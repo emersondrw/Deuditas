@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect, useMemo } from "react"
 import type { DebtType } from "../types"
 import { getCurrencyInfo, CURRENCIES } from "../utils/format"
+import { CATEGORIES } from "../utils/categories"
 
 interface Props {
   names: string[]
   currency?: string
-  onAdd: (name: string, amount: number, type: DebtType, currency: string) => void
+  onAdd: (name: string, amount: number, type: DebtType, currency: string, category: string, dueDate?: string) => void
   onAddToExisting: (name: string, amount: number, type: DebtType, currency: string) => boolean
 }
 
@@ -15,6 +16,8 @@ export function DebtForm({ names, currency = "PEN", onAdd, onAddToExisting }: Pr
   const [amount, setAmount] = useState("")
   const [type, setType] = useState<DebtType>("me-deben")
   const [selectedCurrency, setSelectedCurrency] = useState(currency)
+  const [selectedCategory, setSelectedCategory] = useState("general")
+  const [dueDate, setDueDate] = useState("")
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false)
   const [currencySearch, setCurrencySearch] = useState("")
   const [showSuggestions, setShowSuggestions] = useState(false)
@@ -26,6 +29,8 @@ export function DebtForm({ names, currency = "PEN", onAdd, onAddToExisting }: Pr
   useEffect(() => {
     if (open) {
       setSelectedCurrency(currency)
+      setSelectedCategory("general")
+      setDueDate("")
       setShowCurrencyDropdown(false)
       setCurrencySearch("")
     }
@@ -79,11 +84,13 @@ export function DebtForm({ names, currency = "PEN", onAdd, onAddToExisting }: Pr
 
     const used = onAddToExisting(finalName, parsed, type, selectedCurrency)
     if (!used) {
-      onAdd(finalName, parsed, type, selectedCurrency)
+      onAdd(finalName, parsed, type, selectedCurrency, selectedCategory, dueDate || undefined)
     }
 
     setName("")
     setAmount("")
+    setDueDate("")
+    setSelectedCategory("general")
     setShowSuggestions(false)
     setShowCurrencyDropdown(false)
     setOpen(false)
@@ -117,20 +124,21 @@ export function DebtForm({ names, currency = "PEN", onAdd, onAddToExisting }: Pr
     <div className="mb-8">
       {open ? (
         <div className="ledger-card rounded-lg p-5 animate-slide-up">
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between mb-4">
             <p className="font-body text-sm font-medium text-white/80">Nueva deuda</p>
             <button
               onClick={() => setOpen(false)}
-              className="w-7 h-7 rounded-md bg-[#222] flex items-center justify-center text-text-secondary hover:text-white hover:bg-[#2a2a2a] transition-colors text-sm"
+              className="w-7 h-7 rounded-md bg-[#222] flex items-center justify-center text-text-secondary hover:text-white hover:bg-[#2a2a2a] transition-colors text-sm cursor-pointer"
             >
               ✕
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 mb-4">
+          {/* Tipo de deuda */}
+          <div className="grid grid-cols-2 gap-2 mb-3">
             <button
               onClick={() => setType("me-deben")}
-              className={`py-2.5 px-3 rounded-md text-sm font-medium transition-colors font-body ${
+              className={`py-2 px-3 rounded-md text-sm font-medium transition-colors font-body cursor-pointer ${
                 type === "me-deben"
                   ? "bg-accent-owed/10 text-accent-owed border border-accent-owed/25"
                   : "bg-[#222] text-text-secondary border border-border-custom hover:bg-surface-hover"
@@ -140,7 +148,7 @@ export function DebtForm({ names, currency = "PEN", onAdd, onAddToExisting }: Pr
             </button>
             <button
               onClick={() => setType("debo")}
-              className={`py-2.5 px-3 rounded-md text-sm font-medium transition-colors font-body ${
+              className={`py-2 px-3 rounded-md text-sm font-medium transition-colors font-body cursor-pointer ${
                 type === "debo"
                   ? "bg-accent-owe/10 text-accent-owe border border-accent-owe/25"
                   : "bg-[#222] text-text-secondary border border-border-custom hover:bg-surface-hover"
@@ -150,11 +158,38 @@ export function DebtForm({ names, currency = "PEN", onAdd, onAddToExisting }: Pr
             </button>
           </div>
 
+          {/* Selector de Categoría */}
+          <div className="mb-3">
+            <p className="text-[10px] uppercase tracking-[0.15em] text-text-secondary mb-1.5 font-body">Categoría</p>
+            <div className="grid grid-cols-3 gap-1.5">
+              {CATEGORIES.map(cat => {
+                const isSelected = selectedCategory === cat.id
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`py-1.5 px-2 rounded-md text-xs font-body flex items-center justify-center gap-1.5 transition-all cursor-pointer truncate ${
+                      isSelected
+                        ? "bg-white/15 text-white border border-white/30 font-medium shadow-xs"
+                        : "bg-[#141414] text-text-secondary border border-border-custom hover:bg-[#202020] hover:text-white"
+                    }`}
+                    title={cat.description}
+                  >
+                    <span>{cat.icon}</span>
+                    <span className="truncate text-[11px]">{cat.name.split("/")[0].trim()}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Nombre con autocompletado */}
           <div className="relative mb-3">
             <input
               ref={inputRef}
               type="text"
-              placeholder="Nombre"
+              placeholder="Nombre de la persona"
               value={name}
               onChange={e => {
                 setName(e.target.value)
@@ -163,12 +198,12 @@ export function DebtForm({ names, currency = "PEN", onAdd, onAddToExisting }: Pr
               onFocus={() => setShowSuggestions(true)}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
               onKeyDown={handleKeyDown}
-              className="w-full ledger-input rounded-md px-4 py-3 text-sm text-white placeholder-text-secondary/50 font-body"
+              className="w-full ledger-input rounded-md px-4 py-2.5 text-sm text-white placeholder-text-secondary/50 font-body"
             />
             {showSuggestions && suggestions.length > 0 && (
               <ul
                 ref={listRef}
-                className="absolute z-10 left-0 right-0 mt-1 ledger-card rounded-md overflow-hidden border border-border-custom"
+                className="absolute z-10 left-0 right-0 mt-1 ledger-card rounded-md overflow-hidden border border-border-custom shadow-xl"
               >
                 {suggestions.map((s, i) => (
                   <li
@@ -188,8 +223,8 @@ export function DebtForm({ names, currency = "PEN", onAdd, onAddToExisting }: Pr
             )}
           </div>
 
-          <div className="flex gap-2 relative">
-            {/* Selector de moneda */}
+          {/* Selector de Moneda y Monto */}
+          <div className="flex gap-2 relative mb-3">
             <div className="relative" ref={currencyDropdownRef}>
               <button
                 type="button"
@@ -244,7 +279,6 @@ export function DebtForm({ names, currency = "PEN", onAdd, onAddToExisting }: Pr
               )}
             </div>
 
-            {/* Input de monto */}
             <input
               type="number"
               placeholder={`0.00 (${selectedCurrencyInfo.symbol})`}
@@ -253,17 +287,42 @@ export function DebtForm({ names, currency = "PEN", onAdd, onAddToExisting }: Pr
               value={amount}
               onChange={e => setAmount(e.target.value)}
               onKeyDown={e => { if (e.key === "Enter") submit() }}
-              className="flex-1 min-w-0 ledger-input rounded-md px-4 py-3 text-sm text-white placeholder-text-secondary/50 font-mono tabular-nums"
+              className="flex-1 min-w-0 ledger-input rounded-md px-4 py-2.5 text-sm text-white placeholder-text-secondary/50 font-mono tabular-nums"
             />
-
-            {/* Botón Agregar */}
-            <button
-              onClick={() => submit()}
-              className="px-5 py-3 rounded-md text-sm font-semibold bg-white text-[#0b0b0b] hover:bg-white/90 transition-colors font-body ledger-btn shrink-0"
-            >
-              Agregar
-            </button>
           </div>
+
+          {/* Fecha límite (opcional) */}
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-1">
+              <label htmlFor="debt-due-date" className="text-[10px] uppercase tracking-[0.15em] text-text-secondary font-body">
+                Fecha límite de pago (opcional)
+              </label>
+              {dueDate && (
+                <button
+                  type="button"
+                  onClick={() => setDueDate("")}
+                  className="text-[10px] text-text-secondary hover:text-white underline cursor-pointer"
+                >
+                  Quitar fecha
+                </button>
+              )}
+            </div>
+            <input
+              id="debt-due-date"
+              type="date"
+              value={dueDate}
+              onChange={e => setDueDate(e.target.value)}
+              className="w-full ledger-input rounded-md px-3 py-2 text-xs text-white font-body bg-[#141414] border border-border-custom"
+            />
+          </div>
+
+          {/* Botón Registrar */}
+          <button
+            onClick={() => submit()}
+            className="w-full py-3 rounded-md text-sm font-semibold bg-white text-[#0b0b0b] hover:bg-white/90 transition-colors font-body ledger-btn cursor-pointer"
+          >
+            Agregar deuda
+          </button>
         </div>
       ) : (
         <button
@@ -271,7 +330,7 @@ export function DebtForm({ names, currency = "PEN", onAdd, onAddToExisting }: Pr
             setOpen(true)
             setTimeout(() => inputRef.current?.focus(), 100)
           }}
-          className="w-full ledger-card rounded-lg py-4 text-text-secondary hover:text-white hover:bg-surface-hover transition-colors text-center text-sm font-medium font-body flex items-center justify-center gap-2 ledger-btn"
+          className="w-full ledger-card rounded-lg py-4 text-text-secondary hover:text-white hover:bg-surface-hover transition-colors text-center text-sm font-medium font-body flex items-center justify-center gap-2 ledger-btn cursor-pointer"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />

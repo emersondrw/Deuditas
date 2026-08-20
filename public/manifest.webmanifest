@@ -1,0 +1,25 @@
+{
+  "name": "Deuditas - Control de Deudas",
+  "short_name": "Deuditas",
+  "description": "Controla quién te debe y a quién le debes de forma rápida, privada y sin servidores.",
+  "start_url": "/Deuditas/",
+  "scope": "/Deuditas/",
+  "display": "standalone",
+  "background_color": "#0b0b0b",
+  "theme_color": "#0b0b0b",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/Deuditas/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/Deuditas/icons.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

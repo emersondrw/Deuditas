@@ -86,7 +86,39 @@ export function InfoModal({ open, onClose }: Props) {
               </svg>
               Multi-moneda y Moneda por Deuda
             </h3>
-            <p>Puedes definir la moneda global desde el botón en el encabezado y también elegir una moneda específica para cada deuda al registrarla. Si tienes deudas en varias monedas, la barra de resumen te permitirá alternar y consultar los balances separados por moneda sin mezclarlos.</p>
+            <p>Puedes definir la moneda global desde el encabezado y también elegir una divisa específica por deuda (PEN, USD, EUR, etc.). La barra de resumen desglosa los totales por moneda automáticamente.</p>
+          </section>
+
+          <section>
+            <h3 className="font-medium text-white mb-1 flex items-center gap-2">
+              <span className="text-sm">🏷️</span>
+              Categorías y Vencimientos
+            </h3>
+            <p>Clasifica tus deudas por motivo (Comida, Préstamo, Hogar, Transporte, Compras) y establece fechas límites de pago con avisos visuales automáticos cuando estén por vencer o vencidas.</p>
+          </section>
+
+          <section>
+            <h3 className="font-medium text-white mb-1 flex items-center gap-2">
+              <svg className="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.073-2.179-.548-1.503-.63-2.47-2.164-2.545-2.264-.074-.101-.611-.813-.611-1.55 0-.737.387-1.1.524-1.25.137-.15.3-.187.4-.187.1 0 .2.001.288.006.096.005.225-.036.35.265.13.313.443 1.077.481 1.157.039.08.065.174.013.279-.053.104-.08.169-.158.26-.079.091-.166.203-.237.272-.08.077-.164.16-.07.322.094.162.417.689.897 1.116.618.55 1.139.721 1.301.802.162.08.257.07.353-.04.096-.11.411-.478.521-.642.11-.164.22-.137.369-.082.15.055.952.449 1.116.531.164.082.274.123.314.192.04.068.04.397-.104.802z" />
+              </svg>
+              Recordatorio por WhatsApp
+            </h3>
+            <p>Desde el detalle de cualquier deuda puedes presionar "Recordar por WhatsApp" para enviar un mensaje cordial y prearmado con el monto y motivo exacto.</p>
+          </section>
+
+          <section>
+            <h3 className="font-medium text-white mb-1 flex items-center gap-2">
+              <svg className="w-4 h-4 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+              Instalar en tu Móvil (iOS y Android)
+            </h3>
+            <p className="space-y-1">
+              <span className="block">• <strong>iPhone (iOS):</strong> En Safari, toca el botón <em>Compartir</em> y selecciona <em>"Agregar a pantalla de inicio"</em>.</span>
+              <span className="block">• <strong>Android:</strong> En Chrome, toca el menú de 3 puntos y pulsa <em>"Instalar aplicación"</em>.</span>
+              <span className="block text-text-secondary text-xs">Funciona 100% offline sin necesidad de conexión.</span>
+            </p>
           </section>
 
           <section>
