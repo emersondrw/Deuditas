@@ -162,8 +162,8 @@ export function TripCreateModal({
   const currInfo = getCurrencyInfo(currency)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-      <div className="ledger-card rounded-2xl w-full max-w-lg p-5 sm:p-6 max-h-[90vh] overflow-y-auto relative border border-border-custom shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-x-hidden">
+      <div className="ledger-card rounded-2xl w-full max-w-lg p-5 sm:p-6 max-h-[90vh] overflow-y-auto overflow-x-hidden relative border border-border-custom shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-border-custom mb-5">
           <div className="flex items-center gap-2.5">
@@ -276,9 +276,9 @@ export function TripCreateModal({
             </div>
           )}
 
-          {/* Fechas y Presupuesto */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
+          {/* Fechas */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="min-w-0">
               <label className="block text-xs font-body text-text-secondary uppercase tracking-wider mb-1.5">
                 Fecha Inicio
               </label>
@@ -286,10 +286,10 @@ export function TripCreateModal({
                 type="date"
                 value={startDate}
                 onChange={e => setStartDate(e.target.value)}
-                className="w-full ledger-input rounded-lg px-3 py-2 text-xs text-white font-mono bg-[#181818]"
+                className="w-full ledger-input rounded-lg text-white font-mono min-w-0"
               />
             </div>
-            <div>
+            <div className="min-w-0">
               <label className="block text-xs font-body text-text-secondary uppercase tracking-wider mb-1.5">
                 Fecha Fin (Opcional)
               </label>
@@ -297,23 +297,25 @@ export function TripCreateModal({
                 type="date"
                 value={endDate}
                 onChange={e => setEndDate(e.target.value)}
-                className="w-full ledger-input rounded-lg px-3 py-2 text-xs text-white font-mono bg-[#181818]"
+                className="w-full ledger-input rounded-lg text-white font-mono min-w-0"
               />
             </div>
-            <div>
-              <label className="block text-xs font-body text-text-secondary uppercase tracking-wider mb-1.5">
-                Presupuesto ({currInfo.symbol})
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={budget}
-                onChange={e => setBudget(e.target.value)}
-                placeholder="Ej: 2500"
-                className="w-full ledger-input rounded-lg px-3 py-2 text-xs text-white font-mono placeholder:text-text-secondary/50"
-              />
-            </div>
+          </div>
+
+          {/* Presupuesto */}
+          <div>
+            <label className="block text-xs font-body text-text-secondary uppercase tracking-wider mb-1.5">
+              Presupuesto Estimado ({currInfo.symbol} {currInfo.code}) - Opcional
+            </label>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              value={budget}
+              onChange={e => setBudget(e.target.value)}
+              placeholder="Ej: 2500"
+              className="w-full ledger-input rounded-lg px-3.5 py-2.5 text-sm text-white font-mono placeholder:text-text-secondary/50 min-w-0"
+            />
           </div>
 
           {/* Participantes (Solo al crear nuevo viaje o informativo) */}

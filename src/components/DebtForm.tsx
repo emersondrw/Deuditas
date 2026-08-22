@@ -312,7 +312,7 @@ export function DebtForm({ names, currency = "PEN", onAdd, onAddToExisting }: Pr
               type="date"
               value={dueDate}
               onChange={e => setDueDate(e.target.value)}
-              className="w-full ledger-input rounded-md px-3 py-2 text-xs text-white font-body bg-[#141414] border border-border-custom"
+              className="w-full ledger-input rounded-md text-white font-mono min-w-0"
             />
           </div>
 

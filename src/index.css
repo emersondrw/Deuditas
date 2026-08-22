@@ -43,6 +43,50 @@
     -moz-appearance: textfield;
     appearance: textfield;
   }
+
+  /* Date inputs unified styling for iOS/Android/Desktop */
+  input[type="date"] {
+    color-scheme: dark;
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    display: flex;
+    align-items: center;
+    background-color: #141414;
+    color: #ffffff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
+    padding: 0.55rem 0.75rem;
+    border-radius: 0.5rem;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    filter: invert(0.85);
+    opacity: 0.7;
+    padding: 0;
+    margin: 0;
+    margin-left: 0.5rem;
+    transition: opacity 0.15s ease, filter 0.15s ease;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+    filter: invert(1);
+  }
+
+  input[type="date"]::-webkit-datetime-edit {
+    padding: 0;
+  }
+
+  input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+  }
 }
 
 @layer components {

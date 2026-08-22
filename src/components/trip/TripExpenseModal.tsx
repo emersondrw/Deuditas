@@ -156,8 +156,8 @@ export function TripExpenseModal({ open, trip, expense, onClose, onSave }: Props
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-fade-in">
-      <div className="ledger-card rounded-2xl w-full max-w-lg p-5 sm:p-6 max-h-[92vh] overflow-y-auto relative border border-border-custom shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-fade-in overflow-x-hidden">
+      <div className="ledger-card rounded-2xl w-full max-w-lg p-5 sm:p-6 max-h-[92vh] overflow-y-auto overflow-x-hidden relative border border-border-custom shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-border-custom mb-4">
           <div className="flex items-center gap-2.5">
@@ -344,7 +344,7 @@ export function TripExpenseModal({ open, trip, expense, onClose, onSave }: Props
           </div>
 
           {/* Fecha */}
-          <div>
+          <div className="min-w-0">
             <label className="block text-xs font-body text-text-secondary uppercase tracking-wider mb-1.5">
               Fecha del Gasto
             </label>
@@ -352,7 +352,7 @@ export function TripExpenseModal({ open, trip, expense, onClose, onSave }: Props
               type="date"
               value={date}
               onChange={e => setDate(e.target.value)}
-              className="w-full ledger-input rounded-lg px-3 py-2 text-xs text-white font-mono bg-[#181818]"
+              className="w-full ledger-input rounded-lg text-white font-mono min-w-0"
             />
           </div>
 
