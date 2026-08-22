@@ -10,7 +10,7 @@ import { useState, useMemo } from "react"
 import type { Trip, TripExpense, SplitMethod, ExpenseSplit } from "../../tripTypes"
 import { formatCurrency, formatShortDate } from "../../utils/format"
 import { calculateTripBalances, exportTripToExcel } from "../../utils/tripSettlement"
-import { TRIP_CATEGORIES, getTripCategoryInfo } from "../../utils/tripCategories"
+import { TRIP_CATEGORIES } from "../../utils/tripCategories"
 import { TripExpenseCard } from "./TripExpenseCard"
 import { TripExpenseModal } from "./TripExpenseModal"
 import { TripBalancesView } from "./TripBalancesView"
@@ -158,11 +158,34 @@ export function TripDetailView({
 
           <button
             type="button"
+            onClick={() => onToggleTripStatus(trip.id)}
+            className="px-2.5 py-1 rounded-lg text-xs bg-[#1c1c1c] hover:bg-[#262626] text-text-secondary hover:text-white border border-border-custom transition-colors cursor-pointer"
+            title={trip.status === "finalizado" ? "Reabrir viaje" : "Finalizar viaje"}
+          >
+            {trip.status === "finalizado" ? "Reabrir" : "Finalizar"}
+          </button>
+
+          <button
+            type="button"
             onClick={() => setEditTripModalOpen(true)}
             className="px-2.5 py-1 rounded-lg text-xs bg-[#1c1c1c] hover:bg-[#262626] text-text-secondary hover:text-white border border-border-custom transition-colors cursor-pointer"
             title="Configurar viaje"
           >
             ⚙️
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (confirm(`¿Estás seguro de eliminar el viaje "${trip.name}" y todos sus gastos asociados?`)) {
+                onDeleteTrip(trip.id)
+                onBack()
+              }
+            }}
+            className="px-2.5 py-1 rounded-lg text-xs bg-rose-950/40 hover:bg-rose-900/60 text-rose-300/80 hover:text-rose-200 border border-rose-800/40 transition-colors cursor-pointer"
+            title="Eliminar viaje"
+          >
+            🗑️
           </button>
         </div>
       </div>

@@ -18,7 +18,7 @@ interface Props {
 }
 
 export function TripBalancesView({ trip, expenses, onOpenWhatsApp, onExportExcel }: Props) {
-  const { totalSpent, balances, categoryMap, expenseCount } = calculateTripBalances(trip, expenses)
+  const { totalSpent, balances, expenseCount } = calculateTripBalances(trip, expenses)
   const transfers = calculateSettlement(trip, expenses)
   const tripCurrency = trip.currency || "PEN"
 

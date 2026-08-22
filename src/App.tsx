@@ -22,7 +22,7 @@ import { TripDetailView } from "./components/trip/TripDetailView"
 import { TripCreateModal } from "./components/trip/TripCreateModal"
 import { exportToExcel } from "./utils/exportExcel"
 import { getCurrencyInfo } from "./utils/format"
-import type { DebtType, DebtEntry } from "./types"
+import type { DebtType } from "./types"
 import type { Trip, TripExpense } from "./tripTypes"
 
 export default function App() {

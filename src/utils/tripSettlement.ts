@@ -195,7 +195,7 @@ export function generateTripWhatsAppMessage(trip: Trip, expenses: TripExpense[])
  **/
 export function exportTripToExcel(trip: Trip, expenses: TripExpense[]): void {
   const tripExpenses = expenses.filter(e => e.tripId === trip.id)
-  const { totalSpent, balances } = calculateTripBalances(trip, expenses)
+  const { balances } = calculateTripBalances(trip, expenses)
   const transfers = calculateSettlement(trip, expenses)
   const tripCurrency = trip.currency || "PEN"
   const participantMap = new Map(trip.participants.map(p => [p.id, p.name]))
