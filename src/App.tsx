@@ -1,14 +1,13 @@
 /**
- * @description       : Main application entry point providing Personal Debts and Group Trips navigation, export/import management, and modal orchestration.
+ * @description       : Main application entry point providing personal debts and collections management, export/import, and modal orchestration.
  * @group             : Core
  * @author            : Emerson VI
- * @last modified on  : 2026-08-21
+ * @last modified on  : 2026-11-21
  * @last modified by  : Emerson VI
  **/
 
-import { useState, useRef, useMemo } from "react"
+import { useState, useRef } from "react"
 import { useDebtStore } from "./store"
-import { useTripStore } from "./tripStore"
 import { SummaryBar } from "./components/SummaryBar"
 import { DebtForm } from "./components/DebtForm"
 import { DebtList } from "./components/DebtList"
@@ -16,17 +15,11 @@ import { DebtDetail } from "./components/DebtDetail"
 import { InfoModal } from "./components/InfoModal"
 import { ExportModal } from "./components/ExportModal"
 import { CurrencyModal } from "./components/CurrencyModal"
-import { TripTabSelector, type AppTab } from "./components/trip/TripTabSelector"
-import { TripList } from "./components/trip/TripList"
-import { TripDetailView } from "./components/trip/TripDetailView"
-import { TripCreateModal } from "./components/trip/TripCreateModal"
 import { exportToExcel } from "./utils/exportExcel"
 import { getCurrencyInfo } from "./utils/format"
 import type { DebtType } from "./types"
-import type { Trip, TripExpense } from "./tripTypes"
 
 export default function App() {
-  // Personal Debts Store
   const {
     entries,
     currency,
@@ -41,28 +34,7 @@ export default function App() {
     importData,
   } = useDebtStore()
 
-  // Group Trips Store
-  const {
-    trips,
-    expenses,
-    selectedTripId,
-    setSelectedTripId,
-    createTrip,
-    updateTrip,
-    deleteTrip,
-    addParticipant,
-    removeParticipant,
-    addExpense,
-    updateExpense,
-    deleteExpense,
-    toggleTripStatus,
-    exportTripData,
-    importTripData,
-  } = useTripStore()
-
-  // Navigation and UI State
-  const [activeTab, setActiveTab] = useState<AppTab>("personal")
-  const [tripCreateModalOpen, setTripCreateModalOpen] = useState(false)
+  // UI State
   const [detailId, setDetailId] = useState<string | null>(null)
   const [infoOpen, setInfoOpen] = useState(false)
   const [exportModalOpen, setExportModalOpen] = useState(false)
@@ -72,17 +44,6 @@ export default function App() {
 
   const currencyInfo = getCurrencyInfo(currency)
   const detailEntry = detailId ? entries.find(e => e.id === detailId) ?? null : null
-
-  // Active selected trip object
-  const activeTrip = useMemo(
-    () => (selectedTripId ? trips.find(t => t.id === selectedTripId) ?? null : null),
-    [trips, selectedTripId]
-  )
-
-  const activeTripsCount = useMemo(
-    () => trips.filter(t => t.status === "activo").length,
-    [trips]
-  )
 
   const handleAddToExisting = (name: string, amount: number, type: DebtType, itemCurrency: string): boolean => {
     const existing = findActiveByNameTypeAndCurrency(name, type, itemCurrency)
@@ -94,27 +55,15 @@ export default function App() {
   }
 
   const handleExportJson = () => {
-    const personalJson = JSON.parse(exportData())
-    const tripData = exportTripData()
-
-    const combinedBackup = {
-      version: 2,
-      currency,
-      exportedAt: personalJson.exportedAt,
-      entries: personalJson.entries,
-      trips: tripData.trips,
-      tripExpenses: tripData.tripExpenses,
-    }
-
-    const json = JSON.stringify(combinedBackup, null, 2)
+    const json = exportData()
     const blob = new Blob([json], { type: "application/json" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = `deuditas-completo-${new Date().toISOString().slice(0, 10)}.json`
+    a.download = `deuditas-${new Date().toISOString().slice(0, 10)}.json`
     a.click()
     URL.revokeObjectURL(url)
-    showToast("Respaldo completo JSON exportado")
+    showToast("Respaldo JSON exportado")
   }
 
   const handleExportExcel = () => {
@@ -128,22 +77,9 @@ export default function App() {
     const reader = new FileReader()
     reader.onload = () => {
       try {
-        const rawContent = reader.result as string
-        const parsed = JSON.parse(rawContent)
-
-        // Import personal debts
-        const okPersonal = importData(rawContent)
-
-        // Import trips if present
-        if (parsed && (Array.isArray(parsed.trips) || Array.isArray(parsed.tripExpenses))) {
-          importTripData({
-            trips: parsed.trips as Trip[],
-            tripExpenses: parsed.tripExpenses as TripExpense[],
-          })
-        }
-
-        if (okPersonal || parsed.trips) {
-          showToast("Datos importados correctamente")
+        const ok = importData(reader.result as string)
+        if (ok) {
+          showToast("Importado correctamente")
         } else {
           showToast("Error: archivo inválido")
         }
@@ -188,9 +124,7 @@ export default function App() {
                 </button>
               </div>
               <p className="text-sm text-text-secondary mt-2 font-body">
-                {activeTab === "personal"
-                  ? "Controla quién te debe y a quién le debes"
-                  : "Gastos compartidos para playa y viajes en grupo"}
+                Controla quién te debe y a quién le debes
               </p>
             </div>
 
@@ -229,73 +163,30 @@ export default function App() {
           </div>
         </header>
 
-        {/* Segmented Top Selector: Deudas Personales vs. Viajes & Grupos */}
-        <TripTabSelector
-          activeTab={activeTab}
-          onSelectTab={tab => {
-            setActiveTab(tab)
-          }}
-          activeTripsCount={activeTripsCount}
-        />
-
         {/* DIVIDER */}
         <div className="mb-6 flex items-center gap-2 text-border-custom select-none">
           <span className="flex-1 h-px bg-border-custom" />
           <span className="font-mono text-[10px] text-border-custom tracking-[0.2em]">
-            {activeTab === "personal" ? "DEUDITAS PERSONALES" : "VIAJES & TURISMO"}
+            DEUDAS · COBROS
           </span>
           <span className="flex-1 h-px bg-border-custom" />
         </div>
 
-        {/* TAB 1: PERSONAL DEBTS */}
-        {activeTab === "personal" && (
-          <div>
-            <SummaryBar entries={entries} currency={currency} />
+        <SummaryBar entries={entries} currency={currency} />
 
-            <DebtForm
-              names={names}
-              currency={currency}
-              onAdd={addEntry}
-              onAddToExisting={handleAddToExisting}
-            />
+        <DebtForm
+          names={names}
+          currency={currency}
+          onAdd={addEntry}
+          onAddToExisting={handleAddToExisting}
+        />
 
-            <DebtList
-              entries={entries}
-              currency={currency}
-              onTogglePaid={togglePaid}
-              onOpenDetail={setDetailId}
-            />
-          </div>
-        )}
-
-        {/* TAB 2: GROUP TRIPS */}
-        {activeTab === "trips" && (
-          <div>
-            {activeTrip ? (
-              <TripDetailView
-                trip={activeTrip}
-                expenses={expenses}
-                onBack={() => setSelectedTripId(null)}
-                onAddExpense={params => addExpense(activeTrip.id, params)}
-                onUpdateExpense={updateExpense}
-                onDeleteExpense={deleteExpense}
-                onUpdateTrip={updateTrip}
-                onDeleteTrip={deleteTrip}
-                onToggleTripStatus={toggleTripStatus}
-                onAddParticipant={addParticipant}
-                onRemoveParticipant={removeParticipant}
-              />
-            ) : (
-              <TripList
-                trips={trips}
-                expenses={expenses}
-                onOpenTrip={setSelectedTripId}
-                onCreateTripClick={() => setTripCreateModalOpen(true)}
-                onToggleTripStatus={toggleTripStatus}
-              />
-            )}
-          </div>
-        )}
+        <DebtList
+          entries={entries}
+          currency={currency}
+          onTogglePaid={togglePaid}
+          onOpenDetail={setDetailId}
+        />
       </div>
 
       {/* Toast Notification */}
@@ -313,17 +204,6 @@ export default function App() {
         onAddPago={(id, amount, note) => addToExisting(id, amount, "pago-parcial", note)}
         onAddIncremento={(id, amount, note) => addToExisting(id, amount, "incremento", note)}
         onUpdateEntry={updateEntry}
-      />
-
-      {/* Trip Creation Modal */}
-      <TripCreateModal
-        open={tripCreateModalOpen}
-        defaultCurrency={currency}
-        onClose={() => setTripCreateModalOpen(false)}
-        onCreateTrip={(name, destination, tripCurrency, participants, options) => {
-          createTrip(name, destination, tripCurrency, participants, options)
-          showToast(`¡Viaje "${name}" creado con éxito! 🏖️`)
-        }}
       />
 
       {/* Export Modal */}
