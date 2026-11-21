@@ -56,7 +56,9 @@ export function todayISO(): string {
 export function getDebtStatus(entry: DebtEntry) {
   const netOwedToMe = entry.type === "me-deben" ? entry.amount : -entry.amount
   const isOwed = netOwedToMe > 0 || (netOwedToMe === 0 && entry.type === "me-deben")
-  const displayAmount = Math.abs(entry.amount)
+  const displayAmount = entry.status === "pagado" && entry.amount <= 0
+    ? getOriginalDebtAmount(entry)
+    : Math.abs(entry.amount)
 
   return {
     isOwed,
@@ -67,6 +69,18 @@ export function getDebtStatus(entry: DebtEntry) {
     bgClass: isOwed ? "bg-accent-owed" : "bg-accent-owe",
     borderClass: isOwed ? "border-l-accent-owed" : "border-l-accent-owe",
   }
+}
+
+/**
+ * @description       : Computes the total amount a debt ever represented (creations + increments), ignoring payments.
+ * @param entry       : Debt entry.
+ * @return            : Original accumulated amount.
+ **/
+export function getOriginalDebtAmount(entry: DebtEntry): number {
+  return entry.history.reduce(
+    (sum, item) => (item.type === "pago-parcial" ? sum : sum + item.amount),
+    0
+  )
 }
 
 export function formatShortDate(dateStr: string): string {

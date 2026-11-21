@@ -6,6 +6,7 @@
  **/
 import { useState, useEffect, useMemo } from "react"
 import { CURRENCIES, formatCurrency } from "../utils/format"
+import { useBodyScrollLock } from "../utils/useBodyScrollLock"
 
 interface Props {
   open: boolean
@@ -17,15 +18,11 @@ interface Props {
 export function CurrencyModal({ open, currentCurrency, onSelectCurrency, onClose }: Props) {
   const [search, setSearch] = useState("")
 
+  useBodyScrollLock(open)
+
   useEffect(() => {
     if (open) {
-      document.body.style.overflow = "hidden"
       setSearch("")
-    } else {
-      document.body.style.overflow = ""
-    }
-    return () => {
-      document.body.style.overflow = ""
     }
   }, [open])
 

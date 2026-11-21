@@ -6,17 +6,20 @@
  * @last modified by  : Emerson VI
  **/
 
-import { useState, useRef } from "react"
+import { useState, useRef, useMemo } from "react"
 import { useDebtStore } from "./store"
 import { SummaryBar } from "./components/SummaryBar"
 import { DebtForm } from "./components/DebtForm"
 import { DebtList } from "./components/DebtList"
 import { DebtDetail } from "./components/DebtDetail"
+import { PeopleList } from "./components/PeopleList"
+import { PersonDetail } from "./components/PersonDetail"
 import { InfoModal } from "./components/InfoModal"
 import { ExportModal } from "./components/ExportModal"
 import { CurrencyModal } from "./components/CurrencyModal"
+import { buildPersonAccounts } from "./utils/personAccounts"
 import { exportToExcel } from "./utils/exportExcel"
-import { getCurrencyInfo } from "./utils/format"
+import { formatCurrency, getCurrencyInfo } from "./utils/format"
 import type { DebtType } from "./types"
 
 export default function App() {
@@ -27,6 +30,7 @@ export default function App() {
     addEntry,
     updateEntry,
     addToExisting,
+    addPersonPayment,
     togglePaid,
     findActiveByNameTypeAndCurrency,
     names,
@@ -36,6 +40,8 @@ export default function App() {
 
   // UI State
   const [detailId, setDetailId] = useState<string | null>(null)
+  const [personKey, setPersonKey] = useState<string | null>(null)
+  const [listView, setListView] = useState<"debts" | "people">("debts")
   const [infoOpen, setInfoOpen] = useState(false)
   const [exportModalOpen, setExportModalOpen] = useState(false)
   const [currencyModalOpen, setCurrencyModalOpen] = useState(false)
@@ -45,6 +51,11 @@ export default function App() {
   const currencyInfo = getCurrencyInfo(currency)
   const detailEntry = detailId ? entries.find(e => e.id === detailId) ?? null : null
 
+  const personAccounts = useMemo(() => buildPersonAccounts(entries, currency), [entries, currency])
+  const activePerson = personKey
+    ? personAccounts.find(account => account.key === personKey) ?? null
+    : null
+
   const handleAddToExisting = (name: string, amount: number, type: DebtType, itemCurrency: string): boolean => {
     const existing = findActiveByNameTypeAndCurrency(name, type, itemCurrency)
     if (existing) {
@@ -52,6 +63,22 @@ export default function App() {
       return true
     }
     return false
+  }
+
+  const handlePersonPayment = (
+    name: string,
+    amount: number,
+    type: DebtType,
+    paymentCurrency: string,
+    note?: string
+  ): number => {
+    const applied = addPersonPayment(name, amount, type, paymentCurrency, note)
+    if (applied > 0) {
+      showToast(`Abono aplicado: ${formatCurrency(applied, paymentCurrency)}`)
+    } else {
+      showToast("No hay deudas activas en esa moneda")
+    }
+    return applied
   }
 
   const handleExportJson = () => {
@@ -181,12 +208,50 @@ export default function App() {
           onAddToExisting={handleAddToExisting}
         />
 
-        <DebtList
-          entries={entries}
-          currency={currency}
-          onTogglePaid={togglePaid}
-          onOpenDetail={setDetailId}
-        />
+        {/* View selector: individual debts vs. consolidated person accounts */}
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <p className="text-[11px] uppercase tracking-[0.15em] text-text-secondary font-body">Vista</p>
+          <div className="bg-[#121212] p-1 rounded-lg border border-border-custom flex items-center gap-1">
+            <button
+              onClick={() => setListView("debts")}
+              className={`px-3 py-1.5 rounded-md text-[11px] font-body transition-all cursor-pointer ${
+                listView === "debts"
+                  ? "bg-[#222] text-white border border-white/10 font-semibold"
+                  : "text-text-secondary hover:text-white/80 hover:bg-[#181818]"
+              }`}
+            >
+              Por deuda
+            </button>
+            <button
+              onClick={() => setListView("people")}
+              className={`px-3 py-1.5 rounded-md text-[11px] font-body transition-all cursor-pointer flex items-center gap-1.5 ${
+                listView === "people"
+                  ? "bg-[#222] text-white border border-white/10 font-semibold"
+                  : "text-text-secondary hover:text-white/80 hover:bg-[#181818]"
+              }`}
+            >
+              <span>Por persona</span>
+              <span className="font-mono text-[10px] px-1.5 py-0.5 rounded-full bg-[#2a2a2a] text-text-secondary border border-border-custom">
+                {personAccounts.length}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {listView === "debts" ? (
+          <DebtList
+            entries={entries}
+            currency={currency}
+            onTogglePaid={togglePaid}
+            onOpenDetail={setDetailId}
+          />
+        ) : (
+          <PeopleList
+            accounts={personAccounts}
+            currency={currency}
+            onOpenPerson={setPersonKey}
+          />
+        )}
       </div>
 
       {/* Toast Notification */}
@@ -204,6 +269,20 @@ export default function App() {
         onAddPago={(id, amount, note) => addToExisting(id, amount, "pago-parcial", note)}
         onAddIncremento={(id, amount, note) => addToExisting(id, amount, "incremento", note)}
         onUpdateEntry={updateEntry}
+      />
+
+      {/* Person Account Statement Modal */}
+      <PersonDetail
+        account={activePerson}
+        currency={currency}
+        onClose={() => setPersonKey(null)}
+        onOpenDebt={(id) => {
+          setPersonKey(null)
+          setDetailId(id)
+        }}
+        onTogglePaid={togglePaid}
+        onRegisterPayment={handlePersonPayment}
+        onToast={showToast}
       />
 
       {/* Export Modal */}

@@ -4,7 +4,7 @@
  * @author            : Emerson VI
  * @last modified on  : 2026-07-21
  **/
-import { useEffect } from "react"
+import { useBodyScrollLock } from "../utils/useBodyScrollLock"
 
 interface Props {
   open: boolean
@@ -15,16 +15,7 @@ interface Props {
 }
 
 export function ExportModal({ open, currency = "PEN", onClose, onExportJson, onExportExcel }: Props) {
-  useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = ""
-    }
-    return () => {
-      document.body.style.overflow = ""
-    }
-  }, [open])
+  useBodyScrollLock(open)
 
   if (!open) return null
 

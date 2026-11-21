@@ -7,6 +7,7 @@
 import * as XLSX from "xlsx"
 import type { DebtEntry } from "../types"
 import { getCategoryInfo } from "./categories"
+import { getOriginalDebtAmount } from "./format"
 
 export function exportToExcel(entries: DebtEntry[], defaultCurrency: string = "PEN"): void {
   const wb = XLSX.utils.book_new()
@@ -52,8 +53,9 @@ export function exportToExcel(entries: DebtEntry[], defaultCurrency: string = "P
       if (entry.type === "me-deben") group.activeMeDeben += entry.amount
       else group.activeDebo += entry.amount
     } else {
-      if (entry.type === "me-deben") group.pagadosMeDeben += entry.amount
-      else group.pagadosDebo += entry.amount
+      const paidAmount = entry.amount <= 0 ? getOriginalDebtAmount(entry) : entry.amount
+      if (entry.type === "me-deben") group.pagadosMeDeben += paidAmount
+      else group.pagadosDebo += paidAmount
     }
   })
 
@@ -93,7 +95,7 @@ export function exportToExcel(entries: DebtEntry[], defaultCurrency: string = "P
       Moneda: entryCurrency,
       Categoría: cat.name,
       Tipo: e.type === "me-deben" ? "Me deben" : "Le debes",
-      "Monto Actual": e.amount,
+      "Monto Actual": e.status === "pagado" && e.amount <= 0 ? getOriginalDebtAmount(e) : e.amount,
       Estado: e.status === "activo" ? "Activo" : "Pagado",
       "Fecha Límite": e.dueDate || "Sin fecha",
       "Fecha Creación": e.createdAt,

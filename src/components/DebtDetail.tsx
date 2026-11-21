@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from "react"
 import type { DebtEntry, DebtType } from "../types"
 import { formatCurrency, getDebtStatus, getCurrencyInfo, getDueDateStatus, generateWhatsAppMessage, CURRENCIES } from "../utils/format"
 import { getCategoryInfo, CATEGORIES } from "../utils/categories"
+import { useBodyScrollLock } from "../utils/useBodyScrollLock"
 
 interface Props {
   entry: DebtEntry | null
@@ -37,9 +38,10 @@ export function DebtDetail({ entry, currency = "PEN", onClose, onAddPago, onAddI
   const [editCurrencySearch, setEditCurrencySearch] = useState("")
   const editCurrencyDropdownRef = useRef<HTMLDivElement>(null)
 
+  useBodyScrollLock(Boolean(entry))
+
   useEffect(() => {
     if (entry) {
-      document.body.style.overflow = "hidden"
       setEditName(entry.name.toUpperCase())
       setEditType(entry.type)
       setEditCurrency(entry.currency || currency)
@@ -47,10 +49,7 @@ export function DebtDetail({ entry, currency = "PEN", onClose, onAddPago, onAddI
       setEditDueDate(entry.dueDate || "")
       setIsEditing(false)
       setAction(null)
-    } else {
-      document.body.style.overflow = ""
     }
-    return () => { document.body.style.overflow = "" }
   }, [entry, currency])
 
   useEffect(() => {

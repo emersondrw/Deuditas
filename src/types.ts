@@ -31,3 +31,27 @@ export interface CurrencyInfo {
   locale: string
   country?: string
 }
+
+export interface PersonCurrencyTotals {
+  meDeben: number
+  debo: number
+  net: number
+  count: number
+}
+
+export interface PersonAccount {
+  key: string
+  name: string
+  debts: DebtEntry[]
+  activeDebts: DebtEntry[]
+  paidDebts: DebtEntry[]
+  totals: Record<string, PersonCurrencyTotals>
+  lastActivity: string
+  oldestDueDate?: string
+  overdueCount: number
+}
+
+export interface PaymentAllocation {
+  entry: DebtEntry
+  amount: number
+}

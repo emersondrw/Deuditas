@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react"
 import type { DebtEntry, HistoryEntry, DebtType } from "./types"
 import { generateId, todayISO } from "./utils/format"
+import { planPersonPayment } from "./utils/personAccounts"
 
 const STORAGE_KEY = "deuditas-data"
 const CURRENCY_STORAGE_KEY = "deuditas-currency"
@@ -162,14 +163,69 @@ export function useDebtStore() {
     }
     const next = entries.map(e => {
       if (e.id !== id) return e
-      const newAmount = type === "pago-parcial" ? e.amount - amount : e.amount + amount
+      const rawAmount = type === "pago-parcial" ? e.amount - amount : e.amount + amount
+      const newAmount = type === "pago-parcial"
+        ? Math.max(0, Math.round(rawAmount * 100) / 100)
+        : Math.round(rawAmount * 100) / 100
       return {
         ...e,
         amount: newAmount,
+        status: type === "pago-parcial" && newAmount <= 0 ? "pagado" as DebtEntry["status"] : e.status,
         history: [...e.history, historyEntry],
       }
     })
     persist(next)
+  }, [entries, currency, persist])
+
+  /**
+   * @description       : Registers a payment for a person and distributes it automatically across their active debts (oldest first).
+   * @param name        : Person name (normalized).
+   * @param amount      : Amount received/paid.
+   * @param type        : Direction ("me-deben" = they pay me, "debo" = I pay them).
+   * @param entryCurrency : Currency of the payment.
+   * @param note        : Optional note added to every affected history entry.
+   * @return            : Total amount actually applied.
+   **/
+  const addPersonPayment = useCallback((
+    name: string,
+    amount: number,
+    type: DebtType,
+    entryCurrency: string,
+    note?: string
+  ): number => {
+    const targetName = name.trim().toUpperCase()
+    const finalCurrency = (entryCurrency || currency).trim().toUpperCase()
+    const personEntries = entries.filter(e => e.name.toUpperCase() === targetName)
+    const plan = planPersonPayment(personEntries, amount, type, finalCurrency, currency)
+    if (plan.allocations.length === 0) return 0
+
+    const now = todayISO()
+    const allocations = new Map(plan.allocations.map(item => [item.entry.id, item.amount]))
+
+    const next = entries.map(e => {
+      const applied = allocations.get(e.id)
+      if (!applied) return e
+
+      const newAmount = Math.max(0, Math.round((e.amount - applied) * 100) / 100)
+      const historyEntry: HistoryEntry = {
+        id: generateId(),
+        type: "pago-parcial",
+        amount: applied,
+        date: now,
+        currency: finalCurrency,
+        note: note || `Abono aplicado desde estado de cuenta`,
+      }
+
+      return {
+        ...e,
+        amount: newAmount,
+        status: newAmount <= 0 ? "pagado" as DebtEntry["status"] : e.status,
+        history: [...e.history, historyEntry],
+      }
+    })
+
+    persist(next)
+    return plan.total
   }, [entries, currency, persist])
 
   const togglePaid = useCallback((id: string) => {
@@ -205,6 +261,7 @@ export function useDebtStore() {
     addEntry,
     updateEntry,
     addToExisting,
+    addPersonPayment,
     togglePaid,
     findActiveByNameTypeAndCurrency,
     findActiveByNameAndType,
